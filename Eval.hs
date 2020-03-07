@@ -124,6 +124,8 @@ step (InitStreams numberOfStreams, env, store, kontinuation, buffer) = return (V
 -- Main stream operation function - when something is stored in buffer, fetch it - otherwise just read whole new line and feed it to buffer and recursively feed it to yourself
 step (Consume no, env, store, kontinuation, buffer)
     -- In the future add error checking whether the buffer number is bigger then initial number of buffers (interplay with initBuffer operation)
+    | buffer == [] = error "Buffer not initialised"
+    | no > length buffer = error "Trying to consume from non existent stream" 
     -- If the buffer for given stream is empty, then try fetching a new line
     | isStreamEmpty no buffer = do
         done<-isEOF
@@ -208,5 +210,5 @@ consumeStream _ _ = error "cannot consume from empty stream"
 -- Runs the code for the hardcoded first task
 main :: IO ()
 main = do 
-    runProgram $ While (Boolean True) (Statement (Statement (Print (Consume 0)) (Print (Consume 0))) (Print (Consume 1)))
+    runProgram $ Statement (InitStreams 2) (While (Boolean True) (Statement (Statement (Print (Consume 0)) (Print (Consume 0))) (Print (Consume 1))))
     return ()
