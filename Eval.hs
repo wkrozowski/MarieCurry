@@ -12,9 +12,19 @@ type Store = Map.Map Address Code
 type Address = Int
 type Buffer = [[Int]]
 
+data ExceptionType =
+      NullPointerException
+    | StreamsNotInitialisedException
+    | NotExistingStreamConsumptionException
+    | DivdeByZeroException
+    | TrapException
+         deriving (Eq, Show)
+
+
 data OpType = Add | LessThan deriving (Eq, Show)
 data Code =   Null 
             | Void 
+            | Exception ExceptionType
             | Number Int 
             | Boolean Bool
             | Location Address
@@ -27,8 +37,10 @@ data Code =   Null
             | InitStreams Int
             | Consume Int
             | Print Code
+            | Throw ExceptionType
+            | TryCatch ExceptionType Code Code
             | BinOp OpType Code Code deriving (Show, Eq)
-data Frame = Branch Code Code Environment | Then Code Environment | EvalRight OpType Code Environment | EvalOp OpType Code Environment | Assign String Environment | EvalPrint Environment deriving (Show)
+data Frame = Branch Code Code Environment | Then Code Environment | EvalRight OpType Code Environment | EvalOp OpType Code Environment | Assign String Environment | EvalPrint Environment | ExceptionHandler ExceptionType Code Environment deriving (Show)
 type Kontinuation = [Frame]
 
 type State = (Code, Environment, Store, Kontinuation, Buffer)
@@ -142,6 +154,24 @@ step (Consume no, env, store, kontinuation, buffer)
             contents = fst consumeResult
             newBuffer = snd consumeResult
             consumeResult = consumeStream no buffer 
+
+-- Throwing an exception
+step (Throw exType, env, store, kontinuation, buffer) = return (Exception exType, env, store, kontinuation, buffer)
+
+-- Reached top of the stack - no exception handler
+step (Exception exType, _, _, [], _) = error ("Unhandled exception : " ++ show exType)
+
+-- Register an exception handler
+step ((TryCatch exType try catch),env,store,kontinuation, buffer) = return (try, env, store, (ExceptionHandler exType catch env):kontinuation, buffer)
+
+-- Finished evaluation inside of an exception handler - no error
+step (v , env2, store, (ExceptionHandler exType catch env):kontinuation, buffer) | isValue v =  return (Void, env, store, kontinuation, buffer)
+
+-- There is an exception, and the handler is correct
+step (Exception exType, env2, store, (ExceptionHandler handlerExType catch env):kontinuation, buffer) | exType == handlerExType = return (catch, env, store, kontinuation, buffer)
+
+-- There is an exception, but the correct handler is not present
+step (ex@(Exception _), env, store, _:kontinuation, buffer) = return (ex, env, store, kontinuation, buffer)
 
 -- For terminal states, evaluated to value, no continuation, just return itself
 step state@(v, _, _, [], _) | isValue v = return state
