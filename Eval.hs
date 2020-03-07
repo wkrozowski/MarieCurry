@@ -5,6 +5,7 @@
 --v ::= n | true | false | loc
 
 import qualified Data.Map as Map
+import System.IO (isEOF)
 
 type Environment = Map.Map String Address
 type Store = Map.Map Address Code
@@ -123,9 +124,17 @@ step (InitStreams numberOfStreams, env, store, kontinuation, buffer) = return (V
 -- Main stream operation function - when something is stored in buffer, fetch it - otherwise just read whole new line and feed it to buffer and recursively feed it to yourself
 step (Consume no, env, store, kontinuation, buffer)
     -- In the future add error checking whether the buffer number is bigger then initial number of buffers (interplay with initBuffer operation)
+    -- If the buffer for given stream is empty, then try fetching a new line
     | isStreamEmpty no buffer = do
-        input<- getLine
-        return (Consume no, env, store, kontinuation, appendToBuffer (processInputLine input) buffer)
+        done<-isEOF
+        if done then 
+            -- Go to halting state
+            return (Void, env, store, [], buffer)
+        else do
+            -- Otherwise fetch a new line
+            input<- getLine
+            return (Consume no, env, store, kontinuation, appendToBuffer (processInputLine input) buffer)
+    -- If buffer is not empty, then just fetch from it
     | otherwise = return (Number contents, env, store, kontinuation, newBuffer) 
         where
             contents = fst consumeResult
@@ -196,7 +205,7 @@ consumeStream 0 (xs:xss) = (head xs, (tail xs):xss)
 consumeStream n (xs:xss) = appendAtFront (consumeStream (n-1) (xss)) xs
 consumeStream _ _ = error "cannot consume from empty stream"
 
--- Runs the code for the first task
+-- Runs the code for the hardcoded first task
 main :: IO ()
 main = do 
     runProgram $ While (Boolean True) (Statement (Statement (Print (Consume 0)) (Print (Consume 0))) (Print (Consume 1)))
