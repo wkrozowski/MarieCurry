@@ -11,28 +11,45 @@ $alpha = [a-zA-Z]
 tokens :-
   $white+       ;
   "--".*        ;
-  $digit+ {\p s -> MkToken p (Num (read s)) }
-  true    {\p s -> MkToken p (Bool True)}
-  false   {\p s -> MkToken p (Bool False)}
-  int     {\p s -> MkToken p TInt }
-  bool    {\p s -> MkToken p TBool }
-  void    {\p s -> MkToken p Void }
-  null    {\p s -> MkToken p Null }
-  if      {\p s -> MkToken p If }
-  else    {\p s -> MkToken p Else }
-  while   {\p s -> MkToken p While }
-  print   {\p s -> MkToken p Print }
-  stream  {\p s -> MkToken p InitStream }
-  consume {\p s -> MkToken p Consume }
-  "="     {\p s -> MkToken p Eq }
-  "<"     {\p s -> MkToken p LessThan }
-  "+"     {\p s -> MkToken p Add }
-  ";"     {\p s -> MkToken p SemiColon }
-  ":"     {\p s -> MkToken p Colon }
-  "("     {\p s -> MkToken p LParen }
-  ")"     {\p s -> MkToken p RParen }
-  "{"     {\p s -> MkToken p LCurly }
-  "}"     {\p s -> MkToken p RCurly}
+  $digit+ {\p s -> MkToken p (TokenNum (read s)) }
+  true    {\p s -> MkToken p (TokenBool True)}
+  false   {\p s -> MkToken p (TokenBool False)}
+  int     {\p s -> MkToken p TokenTInt }
+  bool    {\p s -> MkToken p TokenTBool }
+  void    {\p s -> MkToken p TokenVoid }
+  null    {\p s -> MkToken p TokenNull }
+  if      {\p s -> MkToken p TokenIf }
+  else    {\p s -> MkToken p TokenElse }
+  while   {\p s -> MkToken p TokenWhile }
+  print   {\p s -> MkToken p TokenPrint }
+  stream  {\p s -> MkToken p TokenInitStream }
+  consume {\p s -> MkToken p TokenConsume }
+  try     {\p s -> MkToken p TokenTry}
+  catch   {\p s -> MkToken p TokenCatch}
+  throw   {\p s -> MkToken p TokenThrow }
+  "="     {\p s -> MkToken p TokenEq }
+  "<"     {\p s -> MkToken p TokenLessThan }
+  "<="    {\p s -> MkToken p TokenLessThanEq }
+  ">"     {\p s -> MkToken p TokenGreaterThan }
+  ">="    {\p s -> MkToken p TokenGreaterThanEq}
+  "=="    {\p s -> MkToken p TokenLogicalEq}
+  "/="    {\p s -> MkToken p TokenNotEq }
+  "!="    {\p s -> MkToken p TokenLogicalXor}
+  "!"     {\p s -> MkToken p TokenLogicalNot}
+  "&&"    {\p s -> MkToken p TokenLogicalAnd}
+  "||"    {\p s -> MkToken p TokenLogicalOr }
+  "/"     {\p s -> MkToken p TokenDivide}
+  "+"     {\p s -> MkToken p TokenAdd }
+  "*"     {\p s -> MkToken p TokenMultiply}
+  "-"     {\p s -> MkToken p TokenSubtract }
+  "%"     {\p s -> MkToken p TokenModulo}
+  ";"     {\p s -> MkToken p TokenSemiColon }
+  ":"     {\p s -> MkToken p TokenColon }
+  "("     {\p s -> MkToken p TokenLParen }
+  ")"     {\p s -> MkToken p TokenRParen }
+  "{"     {\p s -> MkToken p TokenLCurly }
+  "}"     {\p s -> MkToken p TokenRCurly}
+
   $alpha [$alpha $digit \_ \’]*   {\p s ->MkToken p (Var s)}
 {
 
@@ -41,28 +58,28 @@ data Token = MkToken AlexPosn TokenClass
     deriving (Show,Eq)
 
 data TokenClass =
-  Num          Int       |
-  Bool         Bool      |
-  Var          String    |
-  If                     |
-  Else                   |
-  While                  |
-  LessThan               |
-  Add                    |
-  Colon                  |
-  SemiColon              |
-  LParen                 |
-  RParen                 |
-  LCurly                 |
-  RCurly                 |
-  Eq                     |
-  TInt                   |
-  TBool                  |
-  Print                  |
-  Consume                |
-  InitStream             |
-  Null                   |
-  Void
+  TokenNum          Int       |
+  TokenBool         Bool      |
+  TokenVar          String    |
+  TokenIf                     |
+  TokenElse                   |
+  TokenWhile                  |
+  TokenLessThan               |
+  TokenAdd                    |
+  TokenColon                  |
+  TokenSemiColon              |
+  TokenLParen                 |
+  TokenRParen                 |
+  TokenLCurly                 |
+  TokenRCurly                 |
+  TokenEq                     |
+  TokenTInt                   |
+  TokenTBool                  |
+  TokenPrint                  |
+  TokenConsume                |
+  TokenInitStream             |
+  TokenNull                   |
+  TokenVoid
   deriving (Eq,Show)
 
 

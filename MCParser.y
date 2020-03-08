@@ -7,28 +7,29 @@ import MCLexer
 %error { parseError }
 
 %token
-      if              { MkToken _ If}
-      while           { MkToken _ While}
-      else            { MkToken _ Else}
-      '='             { MkToken _ Eq}
-      '+'             { MkToken _ Add}
-      '{'             { MkToken _ LCurly}
-      '}'             { MkToken _ RCurly}
-      '('             { MkToken _ LParen}
-      ')'             { MkToken _ RParen}
-      ':'             { MkToken _ Colon}
-      ';'             { MkToken _ SemiColon}
-      '<'             { MkToken _ LessThan}
-      number          { MkToken _ (Num $$)}
-      intT            { MkToken _ TInt}
-      bool            { MkToken _ (Bool $$)}
-      boolT           { MkToken _ TBool}
-      void            { MkToken _ Void}
-      null            { MkToken _ Null}
-      var             { MkToken _ (Var $$)}
-      print           { MkToken _ Print}
-      consume         { MkToken _ Consume}
-      stream          { MkToken _ InitStream}
+      if              { MkToken _ TokenIf}
+      while           { MkToken _ TokenWhile}
+      else            { MkToken _ TokenElse}
+      '='             { MkToken _ TokenEq}
+      '+'             { MkToken _ TokenAdd}
+      '{'             { MkToken _ TokenLCurly}
+      '}'             { MkToken _ TokenRCurly}
+      '('             { MkToken _ TokenLParen}
+      ')'             { MkToken _ TokenRParen}
+      ':'             { MkToken _ TokenColon}
+      ';'             { MkToken _ TokenSemiColon}
+      '<'             { MkToken _ TokenLessThan}
+      '>'             { MkToken _ TokenGreaterThan}
+      number          { MkToken _ (TokenNum $$)}
+      intT            { MkToken _ TokenTInt}
+      bool            { MkToken _ (TokenBool $$)}
+      boolT           { MkToken _ TokenTBool}
+      void            { MkToken _ TokenVoid}
+      null            { MkToken _ TokenNull}
+      var             { MkToken _ (TokenVar $$)}
+      print           { MkToken _ TokenPrint}
+      consume         { MkToken _ TokenConsume}
+      stream          { MkToken _ TokenInitStream}
 
 %%
 
@@ -55,8 +56,10 @@ Expression : Binary_Operation           {$1}
            | Exp2                       {$1}
 
 
-Binary_Operation : Exp2 '+' Exp2 {Addition $1 $3}
-                 | Exp2 '<' Exp2 {CompLT $1 $3}
+Binary_Operation : Exp2 Binary_Operator Exp2 {Bin_Op $2 $1 $3}
+
+Binary_Operator: '+' {Add}
+               | '<' {LessThan}
 
 
 Exp2 : '(' Statement ')'                                                  {$2}
@@ -89,9 +92,12 @@ data Statement = Stmnt Statement Statement
                | Number Int
                | Stream Statement
                | ConsumeStream Statement
-               | Addition Statement Statement
-               | CompLT Statement Statement
+               | Bin_Op Binary_Operator Statement Statement
                deriving (Show)
+
+data Binary_Operator = Addition
+                     | CompLT
+                     deriving (Show)
 
 data Type     = IntT
               | BoolT
