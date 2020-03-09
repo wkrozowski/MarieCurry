@@ -59,25 +59,25 @@ import MCLexer
 %%
 
 
-Statement : Expression ';' Statement         {Stmnt $1 $3}
+Statement : Expression ';' Statement         {Statement $1 $3}
           | Expression ';'                   {$1}
-          | Selection_Statement Statement    {Stmnt $1 $2}
-          | Iteration_Statement Statement    {Stmnt $1 $2}
+          | Selection_Statement Statement    {Statement $1 $2}
+          | Iteration_Statement Statement    {Statement $1 $2}
           | Selection_Statement              {$1}
           | Iteration_Statement              {$1}
 
-Selection_Statement: if '(' Expression ')' Compound_Statement else Compound_Statement  {IFE $3 $5 $7}
-                   | if '(' Expression ')' Compound_Statement                          {IF $3 $5}
-                   | try Compound_Statement catch '(' Exception ')' Compound_Statement {TC $2 $5 $7}
+Selection_Statement: if '(' Expression ')' Compound_Statement else Compound_Statement  {IfElse $3 $5 $7}
+                   | if '(' Expression ')' Compound_Statement                          {If $3 $5}
+                   | try Compound_Statement catch '(' Exception ')' Compound_Statement {TryCatch $2 $5 $7}
 
-Iteration_Statement: while '(' Expression ')' Compound_Statement {WL $3 $5}
+Iteration_Statement: while '(' Expression ')' Compound_Statement {While $3 $5}
 
 Compound_Statement: '{' Statement '}' {$2}
 
 Expression : Operation                      {$1}
            | var '=' Expression             {Assignment $1 $3}
            | Type var                       {Declaration $1 $2}
-           | print   Expression             {Stdout $2}
+           | print   Expression             {Print $2}
            | consume Expression             {ConsumeStream $2}
            | stream  Expression             {Stream $2}
            | throw Exception                {Throw $2}
@@ -105,11 +105,11 @@ Exp2 : '(' Operation ')'                                                  {$2}
      | bool                                                               {Boolean $1}
      | number                                                             {Number $1}
 
-Exception : NullPointerException                  {NPE}
-          | StreamsNotInitialisedException        {SNIE}
-          | NotExistingStreamConsumptionException {NESCE}
-          | DivideByZeroException                 {DBZE}
-          | TrapException                         {TE}
+Exception : NullPointerException                  {NullPointerException}
+          | StreamsNotInitialisedException        {StreamsNotIntialisedException}
+          | NotExistingStreamConsumptionException {NotExistingStreamConsumptionException}
+          | DivideByZeroException                 {DivideByZeroException}
+          | TrapException                         {TrapException}
 
 Type : boolT             {BoolT}
      | intT              {IntT}
@@ -125,19 +125,19 @@ parseError input = error ("error while parsing in line " ++ (show line) ++ " col
         position = tokenPosn $ head input
 
 
-data Statement = Stmnt Statement Statement
-               | IFE Statement Statement Statement
-               | IF Statement Statement
-               | WL Statement Statement
+data Statement = Statement Statement Statement
+               | IfElse Statement Statement Statement
+               | If Statement Statement
+               | While Statement Statement
                | Assignment String Statement
                | Declaration Type String
-               | Stdout Statement
+               | Print Statement
                | Boolean Bool
                | Variable String
                | Number Int
                | Stream Statement
                | ConsumeStream Statement
-               | TC Statement Exception Statement
+               | TryCatch Statement Exception Statement
                | Throw Exception
                | Add Statement Statement
                | LessThan Statement Statement
@@ -156,11 +156,11 @@ data Statement = Stmnt Statement Statement
                | Not Statement
                deriving (Show)
 
-data Exception = NPE
-               | SNIE
-               | NESCE
-               | DBZE
-               | TE
+data Exception = NullPointerException
+               | StreamsNotIntialisedException
+               | NotExistingStreamConsumptionException
+               | DivideByZeroException
+               | TrapException
                deriving (Show)
 
 
