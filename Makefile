@@ -5,4 +5,4 @@ MCLexer.hs: MCLexer.x
 	alex MCLexer.x
 
 MCParser.hs: MCParser.y
-	happy MCParser.y
+	happy -i  MCParser.y
