@@ -1,0 +1,7 @@
+stream 2;
+while(true)
+{
+  print consume 0;
+  print consume 0;
+  print consume 1;
+}

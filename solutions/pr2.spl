@@ -1,0 +1,15 @@
+stream 3;
+int ax;
+int bx;
+int cx;
+while(true)
+{
+ ax = consume 0;
+ bx = consume 1;
+ cx = consume 2;
+ print cx;
+ print bx;
+ print ax;
+ print ax + bx;
+ print bx + cx;
+}
