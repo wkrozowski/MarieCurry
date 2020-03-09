@@ -33,8 +33,7 @@ tokens :-
   ">"     {\p s -> MkToken p TokenGreaterThan }
   ">="    {\p s -> MkToken p TokenGreaterThanEq}
   "=="    {\p s -> MkToken p TokenLogicalEq}
-  "/="    {\p s -> MkToken p TokenNotEq }
-  "!="    {\p s -> MkToken p TokenLogicalXor}
+  "!="    {\p s -> MkToken p TokenNotEq }
   "!"     {\p s -> MkToken p TokenLogicalNot}
   "&&"    {\p s -> MkToken p TokenLogicalAnd}
   "||"    {\p s -> MkToken p TokenLogicalOr }
@@ -49,8 +48,12 @@ tokens :-
   ")"     {\p s -> MkToken p TokenRParen }
   "{"     {\p s -> MkToken p TokenLCurly }
   "}"     {\p s -> MkToken p TokenRCurly}
-
-  $alpha [$alpha $digit \_ \’]*   {\p s ->MkToken p (Var s)}
+  NullPointerException                    {\p s -> MkToken p TokenNPE}
+  StreamsNotInitialisedException          {\p s -> MkToken p TokenSNIE}
+  NotExistingStreamConsumptionException   {\p s -> MkToken p TokenNESCE}
+  DivideByZeroException                   {\p s -> MkToken p TokenDBZE}
+  TrapException                           {\p s -> MkToken p TokenTE}
+  $alpha [$alpha $digit \_ \’]*           {\p s -> MkToken p (TokenVar s)}
 {
 
 -- The token type:
@@ -79,8 +82,28 @@ data TokenClass =
   TokenConsume                |
   TokenInitStream             |
   TokenNull                   |
-  TokenVoid
-  deriving (Eq,Show)
+  TokenVoid                   |
+  TokenModulo                 |
+  TokenSubtract               |
+  TokenDivide                 |
+  TokenMultiply               |
+  TokenLessThanEq             |
+  TokenGreaterThan            |
+  TokenGreaterThanEq          |
+  TokenLogicalEq              |
+  TokenNotEq                  |
+  TokenLogicalNot             |
+  TokenLogicalAnd             |
+  TokenLogicalOr              |
+  TokenTry                    |
+  TokenCatch                  |
+  TokenThrow                  |
+  TokenNPE                    |
+  TokenSNIE                   |
+  TokenNESCE                  |
+  TokenDBZE                   |
+  TokenTE
+    deriving (Show,Eq)
 
 
 tokenPosn :: Token -> (Int, Int)
