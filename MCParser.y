@@ -100,7 +100,7 @@ Operation      : Operation '+'  Operation     {Add $1 $3}
                | Exp2                         {$1}
 
 
-Exp2 : '(' Operation ')'                                                  {$2}
+Exp2 : '(' Expression ')'                                                  {$2}
      | var                                                                {Variable $1}
      | bool                                                               {Boolean $1}
      | number                                                             {Number $1}
