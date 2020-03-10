@@ -6,6 +6,7 @@ import MCLexer
 %tokentype { Token }
 %error { parseError }
 
+
 %token
       if              { MkToken _ TokenIf}
       while           { MkToken _ TokenWhile}
@@ -31,19 +32,18 @@ import MCLexer
       '*'             { MkToken _ TokenMultiply}
       '-'             { MkToken _ TokenSubtract }
       '%'             { MkToken _ TokenModulo}
+      catch           { MkToken _ TokenCatch}
       try             { MkToken _ TokenTry}
-      catch           {MkToken _ TokenCatch}
-      throw           {MkToken _ TokenThrow}
+      throw           { MkToken _ TokenThrow}
       number          { MkToken _ (TokenNum $$)}
       intT            { MkToken _ TokenTInt}
       bool            { MkToken _ (TokenBool $$)}
       boolT           { MkToken _ TokenTBool}
       void            { MkToken _ TokenVoid}
-      null            { MkToken _ TokenNull}
       var             { MkToken _ (TokenVar $$)}
       print           { MkToken _ TokenPrint}
       consume         { MkToken _ TokenConsume}
-      stream          { MkToken _ TokenInitStream}
+      streams         { MkToken _ TokenInitStreams}
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}
@@ -59,116 +59,115 @@ import MCLexer
 %%
 
 
-Statement : Expression ';' Statement         {Statement $1 $3}
+Stmt : Expression ';' Stmt         {Stmt $1 $3}
           | Expression ';'                   {$1}
-          | Selection_Statement Statement    {Statement $1 $2}
-          | Iteration_Statement Statement    {Statement $1 $2}
-          | Selection_Statement              {$1}
-          | Iteration_Statement              {$1}
+          | Selection_Stmt Stmt    {Stmt $1 $2}
+          | Iteration_Stmt Stmt    {Stmt $1 $2}
+          | Selection_Stmt              {$1}
+          | Iteration_Stmt              {$1}
 
-Selection_Statement: if '(' Expression ')' Compound_Statement else Compound_Statement  {IfElse $3 $5 $7}
-                   | if '(' Expression ')' Compound_Statement                          {If $3 $5}
-                   | try Compound_Statement catch '(' Exception ')' Compound_Statement {TryCatch $2 $5 $7}
+Selection_Stmt:      if '(' Expression ')' Compound_Stmt else Compound_Stmt  {IfStmtElse $3 $5 $7}
+                   | if '(' Expression ')' Compound_Stmt                          {IfStmt $3 $5}
+                   | try Compound_Stmt catch '(' Exception ')' Compound_Stmt {TryCatchStmt $2 $5 $7}
 
-Iteration_Statement: while '(' Expression ')' Compound_Statement {While $3 $5}
+Iteration_Stmt: while '(' Expression ')' Compound_Stmt {WhileStmt $3 $5}
 
-Compound_Statement: '{' Statement '}' {$2}
+Compound_Stmt: '{' Stmt '}' {$2}
 
 Expression : Operation                      {$1}
-           | var '=' Expression             {Assignment $1 $3}
+           | var '=' Expression             {AssignmentStmt $1 $3}
            | Type var                       {Declaration $1 $2}
-           | print   Expression             {Print $2}
+           | print Expression               {PrintOp $2}
            | consume Expression             {ConsumeStream $2}
-           | stream  Expression             {Stream $2}
-           | throw Exception                {Throw $2}
+           | streams Expression             {Streams $2}
+           | throw Exception                {ThrowStmt $2}
 
-Operation      : Operation '+'  Operation     {Add $1 $3}
-               | Operation '-'  Operation     {Subtract $1 $3}
-               | Operation '<'  Operation     {LessThan $1 $3}
-               | Operation '<=' Operation     {LessThanEq $1 $3}
-               | Operation '>'  Operation     {GreaterThan $1 $3}
-               | Operation '>=' Operation     {GreaterThanEq $1 $3}
-               | Operation '*'  Operation     {Multiply $1 $3}
-               | Operation '%'  Operation     {Modulo $1 $3}
-               | Operation '/'  Operation     {Divide $1 $3}
-               | Operation '==' Operation     {Equal $1 $3}
-               | Operation '!=' Operation     {NotEqual $1 $3}
-               | Operation '||' Operation     {Or $1 $3}
-               | Operation '&&' Operation     {And $1 $3}
-               | '-' Operation  %prec UNARY   {Negate $2}
-               | '!' Operation  %prec UNARY   {Not $2}
+Operation      : Operation '+'  Operation     {AddOp $1 $3}
+               | Operation '-'  Operation     {SubtractOp $1 $3}
+               | Operation '<'  Operation     {LessThanOp $1 $3}
+               | Operation '<=' Operation     {LessThanEqOp $1 $3}
+               | Operation '>'  Operation     {GreaterThanOp $1 $3}
+               | Operation '>=' Operation     {GreaterThanEqOp $1 $3}
+               | Operation '*'  Operation     {MultiplyOp $1 $3}
+               | Operation '%'  Operation     {ModuloOp $1 $3}
+               | Operation '/'  Operation     {DivideOp $1 $3}
+               | Operation '==' Operation     {EqualOp $1 $3}
+               | Operation '!=' Operation     {NotEqualOp $1 $3}
+               | Operation '||' Operation     {OrOp $1 $3}
+               | Operation '&&' Operation     {AndOp $1 $3}
+               | '-' Operation  %prec UNARY   {NegateOp $2}
+               | '!' Operation  %prec UNARY   {NotOp $2}
                | Exp2                         {$1}
 
 
-Exp2 : '(' Operation ')'                                                  {$2}
+Exp2 : '(' Expression ')'                                                  {$2}
      | var                                                                {Variable $1}
-     | bool                                                               {Boolean $1}
-     | number                                                             {Number $1}
+     | bool                                                               {BoolVal $1}
+     | number                                                             {NumVal $1}
 
-Exception : NullPointerException                  {NullPointerException}
-          | StreamsNotInitialisedException        {StreamsNotIntialisedException}
-          | NotExistingStreamConsumptionException {NotExistingStreamConsumptionException}
-          | DivideByZeroException                 {DivideByZeroException}
-          | TrapException                         {TrapException}
+Exception : NullPointerException                  {NullPointer}
+          | StreamsNotInitialisedException        {StreamsNotIntialised}
+          | NotExistingStreamConsumptionException {NotExistingStreamConsumption}
+          | DivideByZeroException                 {DivideByZero}
+          | TrapException                         {Trap}
 
 Type : boolT             {BoolT}
      | intT              {IntT}
      | void              {VoidT}
-     | null              {NullT}
 
 {
 parseError :: [Token] -> a
-parseError input = error ("error while parsing in line " ++ (show line) ++ " column " ++ (show column))
+parseError input = error ("error parsing in line " ++ (show line) ++ " column " ++ (show column))
     where
         line = fst position
         column = snd position
         position = tokenPosn $ head input
 
 
-data Statement = Statement Statement Statement
-               | IfElse Statement Statement Statement
-               | If Statement Statement
-               | While Statement Statement
-               | Assignment String Statement
+data Stmt = Stmt Stmt Stmt
+               | IfStmtElse Stmt Stmt Stmt
+               | IfStmt Stmt Stmt
+               | WhileStmt Stmt Stmt
+               | AssignmentStmt String Stmt
                | Declaration Type String
-               | Print Statement
-               | Boolean Bool
+               | PrintOp Stmt
+               | BoolVal Bool
                | Variable String
-               | Number Int
-               | Stream Statement
-               | ConsumeStream Statement
-               | TryCatch Statement Exception Statement
-               | Throw Exception
-               | Add Statement Statement
-               | LessThan Statement Statement
-               | LessThanEq Statement Statement
-               | GreaterThan Statement Statement
-               | GreaterThanEq Statement Statement
-               | Subtract Statement Statement
-               | Multiply Statement Statement
-               | Modulo Statement Statement
-               | Divide Statement Statement
-               | Equal Statement Statement
-               | NotEqual Statement Statement
-               | Or Statement Statement
-               | And Statement Statement
-               | Negate Statement
-               | Not Statement
+               | NumVal Int
+               | Streams Stmt
+               | ConsumeStream Stmt
+               | TryCatchStmt Stmt ExceptionType Stmt
+               | ThrowStmt ExceptionType
+               | AddOp Stmt Stmt
+               | LessThanOp Stmt Stmt
+               | LessThanEqOp Stmt Stmt
+               | GreaterThanOp Stmt Stmt
+               | GreaterThanEqOp Stmt Stmt
+               | SubtractOp Stmt Stmt
+               | MultiplyOp Stmt Stmt
+               | ModuloOp Stmt Stmt
+               | DivideOp Stmt Stmt
+               | EqualOp Stmt Stmt
+               | NotEqualOp Stmt Stmt
+               | OrOp Stmt Stmt
+               | AndOp Stmt Stmt
+               | NegateOp Stmt
+               | NotOp Stmt
                deriving (Show)
 
-data Exception = NullPointerException
-               | StreamsNotIntialisedException
-               | NotExistingStreamConsumptionException
-               | DivideByZeroException
-               | TrapException
+data ExceptionType = NullPointer
+               | StreamsNotIntialised
+               | NotExistingStreamConsumption
+               | DivideByZero
+               | Trap
                deriving (Show)
 
 
 data Type     = IntT
               | BoolT
               | VoidT
-              | NullT
-              deriving (Show)
+              | StmtT
+              deriving (Show, Eq)
 
 
 
