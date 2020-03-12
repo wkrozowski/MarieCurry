@@ -1,11 +1,11 @@
-stream 1;
+streams 1;
 int a1;
 int a2;
 int a3;
 while(true)
 {
-  a1 = 3 * (consume 0) - 1;
-  a2 = 2 * (consume 0);
+  a1 = (3 * (consume 0)) - 1;
+  a2 = (2 * (consume 0));
   a3 = consume 0;
   print a3;
   print a2;

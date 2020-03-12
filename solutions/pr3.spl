@@ -1,6 +1,7 @@
-stream 2;
+streams 2;
 print 0;
 int counter;
+counter = 0;
 while (true)
 {
   counter = counter + 1;

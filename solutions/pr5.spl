@@ -1,4 +1,4 @@
-stream 1;
+streams 1;
 int ax;
 ax = 0;
 while (true)

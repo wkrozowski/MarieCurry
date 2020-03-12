@@ -1,4 +1,4 @@
-stream 3;
+streams 3;
 int ax;
 int bx;
 int cx;

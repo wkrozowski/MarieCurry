@@ -1,3 +1,5 @@
+module Eval(runProgram, convert, Code) where
+
 --e ::= v | x | e op e
 --    | while (e) e | if (e) then e else e
 --    | var x = e; e | x = e | e; e
@@ -7,12 +9,15 @@
 import qualified Data.Map as Map
 import System.IO (isEOF)
 import Data.Bits(xor)
+import MCParser
+import MCLexer
+
 type Environment = Map.Map String Address
 type Store = Map.Map Address Code
 type Address = Int
 type Buffer = [[Int]]
 
-data ExceptionType =
+data ExceptionCodeType =
       NullPointerException
     | StreamsNotInitialisedException
     | NotExistingStreamConsumptionException
@@ -45,7 +50,7 @@ data OpType =
 
 data Code =   Null 
             | Void 
-            | Exception ExceptionType
+            | Exception ExceptionCodeType
             | Number Int 
             | Boolean Bool
             | Location Address
@@ -58,13 +63,13 @@ data Code =   Null
             | InitStreams Int
             | Consume Int
             | Print Code
-            | Throw ExceptionType
-            | TryCatch ExceptionType Code Code
+            | Throw ExceptionCodeType
+            | TryCatch ExceptionCodeType Code Code
             | BinOp OpType Code Code
             | UnaryOp UnaryOpType Code 
                 deriving (Show, Eq)
 
-data Frame = Branch Code Code Environment | Then Code Environment | EvalRight OpType Code Environment | EvalOp OpType Code Environment | Assign String Environment | EvalPrint Environment | ExceptionHandler ExceptionType Code Environment | EvalUnaryOp UnaryOpType Environment deriving (Show)
+data Frame = Branch Code Code Environment | Then Code Environment | EvalRight OpType Code Environment | EvalOp OpType Code Environment | Assign String Environment | EvalPrint Environment | ExceptionHandler ExceptionCodeType Code Environment | EvalUnaryOp UnaryOpType Environment deriving (Show)
 type Kontinuation = [Frame]
 
 
@@ -149,7 +154,7 @@ step (v, env2, store, (EvalRight operation rhs env1):kontinuation, buffer)
 
 -- After evaluating rhs, perform the operation
 step (rhs, env2, store, (EvalOp operation v env1):kontinuation, buffer) 
-    | isValue v = return ((evalBinop operation v rhs),env1,store,kontinuation, buffer)
+    | isValue rhs = return ((evalBinop operation v rhs),env1,store,kontinuation, buffer)
 
 -- When seing unary operation, try to evaluate it first to terminal value, and save the operation type and environment to the stack
 step (UnaryOp opType expr, env, store, kontinuation, buffer) = return (expr, env, store, (EvalUnaryOp opType env):kontinuation, buffer)
@@ -227,7 +232,7 @@ evalBinop GreaterThan (Number m) (Number n) = (Boolean (m>n))
 evalBinop LogicalAnd (Boolean m) (Boolean n) = (Boolean (m && n))
 evalBinop LogicalOr (Boolean m) (Boolean n) = (Boolean (m || n))
 evalBinop LogicalXor (Boolean m) (Boolean n) = (Boolean (xor m n))
-evalBinop _ _ _ = error "not valid"
+evalBinop a b c = error ("not valid" ++ (show a) ++ " " ++ (show b) ++ " " ++ (show c))
 
 evalUnary :: UnaryOpType -> Code -> Code
 evalUnary LogicalNot (Boolean m) = (Boolean (not m))
@@ -296,8 +301,55 @@ consumeStream 0 (xs:xss) = (head xs, (tail xs):xss)
 consumeStream n (xs:xss) = appendAtFront (consumeStream (n-1) (xss)) xs
 consumeStream _ _ = error "cannot consume from empty stream"
 
--- Runs the code for the hardcoded first task
-main :: IO ()
-main = do 
-    runProgram $ Statement (InitStreams 2) (While (Boolean True) (Statement (Statement (Print (Consume 0)) (Print (Consume 0))) (Print (Consume 1))))
-    return ()
+
+convertException :: ExceptionType -> ExceptionCodeType
+convertException (NullPointer) = NullPointerException
+convertException (StreamsNotIntialised) = StreamsNotInitialisedException
+convertException NotExistingStreamConsumption = NotExistingStreamConsumptionException
+convertException DivideByZero = DivideByZeroException
+convertException Trap = TrapException
+
+
+-- Converts type checked output from parser to bytecode
+convert :: Stmt -> Code
+convert (Stmt a as) = (Statement (convert a) (convert as))
+convert (NumVal n) = (Number n)
+convert (BoolVal b) = (Boolean b)
+convert (Variable v) = (Reference v)
+-- this one needs fixing
+convert (Streams (NumVal s)) = (InitStreams s)
+--
+convert (PrintOp s) = (Print (convert s))
+convert (Declaration _ name) = (Definition name)
+convert (AssignmentStmt name val) = (Assignment name (convert val))
+convert (WhileStmt cond body) = (While (convert cond) (convert body))
+convert (IfStmtElse cond a b) = (If (convert cond) (convert a) (convert b))
+convert (IfStmt cond a) = (If (convert cond) (convert a) (Void))
+convert (ConsumeStream (NumVal n)) = (Consume n)
+convert (TryCatchStmt body ex handler) = (TryCatch  (convertException ex) (convert body) (convert handler))
+convert (ThrowStmt ex) = (Throw (convertException ex))
+convert (AddOp lhs rhs) = (BinOp Add (convert lhs) (convert rhs))
+convert (LessThanOp lhs rhs) = (BinOp LessThan (convert lhs) (convert rhs))
+convert (LessThanEqOp lhs rhs) = (BinOp LessOrEqual (convert lhs) (convert rhs))
+convert (GreaterThanOp lhs rhs) = (BinOp GreaterThan (convert lhs) (convert rhs))
+convert (GreaterThanEqOp lhs rhs) = (BinOp GreaterOrEqual (convert lhs) (convert rhs))
+-- Fix typo in the name
+convert (SubtractOp lhs rhs) = (BinOp Substract (convert lhs) (convert rhs))
+convert (ModuloOp lhs rhs) = (BinOp Modulo (convert lhs) (convert rhs))
+convert (DivideOp lhs rhs) = (BinOp Divide (convert lhs) (convert rhs))
+convert (MultiplyOp lhs rhs) = (BinOp Multiply (convert lhs) (convert rhs))
+convert (EqualOp lhs rhs) = (BinOp Equal (convert lhs) (convert rhs))
+convert (NotEqualOp lhs rhs) = (BinOp NotEqual (convert lhs) (convert rhs))
+convert (OrOp lhs rhs) = (BinOp LogicalOr (convert lhs) (convert rhs))
+convert (AndOp lhs rhs) = (BinOp LogicalAnd (convert lhs) (convert rhs))
+convert (NegateOp v) = (UnaryOp Negate (convert v))
+convert (NotOp v) = (UnaryOp LogicalNot (convert v))
+
+
+
+
+-- -- Runs the code for the hardcoded first task
+-- main :: IO ()
+-- main = do 
+--     runProgram $ Statement (InitStreams 2) (While (Boolean True) (Statement (Statement (Print (Consume 0)) (Print (Consume 0))) (Print (Consume 1))))
+--     return ()
