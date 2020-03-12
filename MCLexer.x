@@ -17,12 +17,11 @@ tokens :-
   int     {\p s -> MkToken p TokenTInt }
   bool    {\p s -> MkToken p TokenTBool }
   void    {\p s -> MkToken p TokenVoid }
-  null    {\p s -> MkToken p TokenNull }
   if      {\p s -> MkToken p TokenIf }
   else    {\p s -> MkToken p TokenElse }
   while   {\p s -> MkToken p TokenWhile }
   print   {\p s -> MkToken p TokenPrint }
-  stream  {\p s -> MkToken p TokenInitStream }
+  streams {\p s -> MkToken p TokenInitStreams }
   consume {\p s -> MkToken p TokenConsume }
   try     {\p s -> MkToken p TokenTry}
   catch   {\p s -> MkToken p TokenCatch}
@@ -80,8 +79,7 @@ data TokenClass =
   TokenTBool                  |
   TokenPrint                  |
   TokenConsume                |
-  TokenInitStream             |
-  TokenNull                   |
+  TokenInitStreams            |
   TokenVoid                   |
   TokenModulo                 |
   TokenSubtract               |
