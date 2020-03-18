@@ -70,6 +70,9 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | check cond env == BoolT = check branch env
 
     check (IfStmtElse cond trueBranch falseBranch) env
+        | check cond env == BoolT && (check trueBranch env)==(check falseBranch env) = (check trueBranch env)
+        | check cond env == BoolT && isList (check trueBranch env) && (check falseBranch env)==EmptyListT = (check trueBranch env)
+         | check cond env == BoolT && isList (check falseBranch env) && (check trueBranch env)==EmptyListT = (check falseBranch env)
         | check cond env == BoolT && (isCorrectType (check trueBranch env)) && (isCorrectType (check falseBranch env)) = StmtT
 
     check (PrintOp v) env
@@ -134,7 +137,7 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (ReturnOp v) env = check v env
 
-    check (HeadOp EmptyListVal) env = error "Consuming from empty list cannot deduce type"
+    check (HeadOp EmptyListVal) env = error "Consuming from empty list - cannot deduce type"
 
     check (HeadOp x) env = 
         let (ListT t)=(check x env) in t
@@ -153,10 +156,14 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (LamExpr t x stmt) env = ArrowT t (check stmt ((x,t):env))
 
     check (Application e1 e2) env = case e1Type of
-        (ArrowT t u) -> if (e2Type==t) then u else error "Type mismatch"
+        (ArrowT t u) -> if (e2Type==t) then u else 
+            if (e2Type==EmptyListT) && (isList t) then u else error "Type mismatch when applying function"
         _ -> error "Cannot apply value to non-function"
         where
             e1Type = check e1 env
             e2Type = check e2 env
 
-    check _ _ = throw (TypeException "Type error")
+    check (ConsOp lhs EmptyListVal) env | isCorrectType (check lhs env) = ListT (check lhs env)
+    check (ConsOp lhs rhs) env 
+        | ListT (check lhs env) == (check rhs env) = (check rhs env)
+        | isCorrectType (check lhs env) && (check rhs env)== EmptyListT = ListT (check lhs env)

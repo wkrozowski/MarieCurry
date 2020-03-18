@@ -1,14 +1,22 @@
-int->int->int f;
-f = \(int x) -> {
-	\(int y) -> {
-		x+y;
+[int]->(int->int)->[int] map;
+
+map = \([int] list) -> {
+	\(int->int fun) -> {
+		if(isEmpty list) {
+			return [];
+		}
+		else {
+			return (fun (head list)) cons (map (tail list) fun);
+		}
 	};
 };
 
-print f 2 4;
+[int] testList;
+testList = 5 cons (6 cons (7 cons []));
 
-int -> int addTwo;
+int->int testFun;
+testFun = \(int x)-> {
+	x+1;
+};
 
-addTwo = f 2;
-
-print addTwo 2;
+map testList testFun;
