@@ -94,10 +94,32 @@ data Frame =  Branch Code Code Environment
             deriving (Show)
 
 data ListContents = Empty | Next Code ListContents deriving (Eq, Show)
+
 type Kontinuation = [Frame]
 
 
 type State = (Code, Environment, Store, Kontinuation, Buffer)
+
+collectEnvs :: Kontinuation -> [Environment]
+collectEnvs ((Branch _ _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((Then _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((EvalRight _ _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((EvalOp _ _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((Assign _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((EvalPrint e):kont) = e:(collectEnvs kont)
+collectEnvs ((ExceptionHandler _ _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((EvalUnaryOp _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((HoleApp _ e ):kont) = e:(collectEnvs kont)
+collectEnvs ((Global e):kont) = e:(collectEnvs kont)
+collectEnvs (_:kont) = (collectEnvs kont)
+collectEnvs _ = []
+
+usedReferences :: Kontinuation -> [Int]
+usedReferences kontinuation = foldl (union) [] $ map (Map.elems) (collectEnvs kontinuation)
+
+garbageCollect :: Environment -> Store -> Kontinuation -> Store
+garbageCollect env store kont = Map.filterWithKey (\k _ -> elem k used) store where
+    used = usedReferences kont ++ Map.elems env 
 
 -- If it is terminal value of the language - return true
 isValue :: Code -> Bool
@@ -127,7 +149,7 @@ step ((Statement e1 e2), env, store, kontinuation, buffer) = return (e1, env, st
 
 -- If e1 has terminated, then restore environment and execute e2
 step (v, env1, store, (Then e2 env2):kontinuation, buffer) 
-    | isValue v =  return (e2, env2, store, kontinuation, buffer)
+    | isValue v =  return (e2, env2, (garbageCollect env2 store kontinuation), kontinuation, buffer)
 
 -- When executing If statement - save the environment and both branches in the continuation and evaluate the condition first
 step ((If cond lhs rhs), env, store, kontinuation, buffer) = return (cond, env, store, (Branch lhs rhs env):kontinuation, buffer)
