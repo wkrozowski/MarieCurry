@@ -15,6 +15,8 @@ import MCLexer
       '+'             { MkToken _ TokenAdd}
       '{'             { MkToken _ TokenLCurly}
       '}'             { MkToken _ TokenRCurly}
+      '['             { MkToken _ TokenLSquare}
+      ']'             { MkToken _ TokenRSquare}
       '('             { MkToken _ TokenLParen}
       ')'             { MkToken _ TokenRParen}
       ':'             { MkToken _ TokenColon}
@@ -42,20 +44,28 @@ import MCLexer
       void            { MkToken _ TokenVoid}
       var             { MkToken _ (TokenVar $$)}
       print           { MkToken _ TokenPrint}
+      head            { MkToken _ TokenHead}
+      tail            { MkToken _ TokenTail}
+      isEmpty         { MkToken _ TokenIsEmpty}
+      cons            { MkToken _ TokenCons}
       consume         { MkToken _ TokenConsume}
       streams         { MkToken _ TokenInitStreams}
+      lambda          { MkToken _ TokenLambda}
+      '->'            { MkToken _ TokenArrow}   
+      unit            { MkToken _ TokenUnit}   
+      return          { MkToken _ TokenReturn}
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}
       DivideByZeroException                 { MkToken _ TokenDBZE}
       TrapException                         { MkToken _ TokenTE}
+      ListEmptyException                    { MkToken _ TokenLEE}
 
 
 %nonassoc '<' '>' '>=' '<=' '==' '!='
-%left '+' '-' '&&' '||'
-%right '*' '/' '%'
+%left '+' '-' '&&' '||' cons
+%right '*' '/' '%' '->'
 %left UNARY
-
 %%
 
 
@@ -76,11 +86,15 @@ Compound_Stmt: '{' Stmt '}' {$2}
 
 Expression : Operation                      {$1}
            | var '=' Expression             {AssignmentStmt $1 $3}
+           | var '=' unit                   {AssignmentStmt $1 UnitVal}
            | Type var                       {Declaration $1 $2}
            | print Expression               {PrintOp $2}
            | consume Expression             {ConsumeStream $2}
            | streams Expression             {Streams $2}
+           | return Expression              {ReturnOp $2}
            | throw Exception                {ThrowStmt $2}
+           | lambda '(' Type var ')' '->' Compound_Stmt  {LamExpr $3 $4 $7}
+           | lambda unit '->' Compound_Stmt {LamExpr UnitT "()" $4} 
 
 Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | Operation '-'  Operation     {SubtractOp $1 $3}
@@ -95,25 +109,39 @@ Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | Operation '!=' Operation     {NotEqualOp $1 $3}
                | Operation '||' Operation     {OrOp $1 $3}
                | Operation '&&' Operation     {AndOp $1 $3}
+               | Operation cons Operation     {ConsOp $1 $3}
                | '-' Operation  %prec UNARY   {NegateOp $2}
                | '!' Operation  %prec UNARY   {NotOp $2}
-               | Exp2                         {$1}
+               | tail Operation %prec UNARY   {TailOp $2}
+               | head Operation %prec UNARY   {HeadOp $2}
+               | isEmpty Operation %prec UNARY {IsEmptyOp $2}
+               | Exp1                         {$1}
+
+Exp1           : Exp1 Exp2                    {Application $1 $2}
+               | Exp1 unit                    {Application $1 UnitVal}
+               | Exp2                         {$1}               
 
 
 Exp2 : '(' Expression ')'                                                  {$2}
      | var                                                                {Variable $1}
      | bool                                                               {BoolVal $1}
      | number                                                             {NumVal $1}
+     | '[' ']'                                                            {EmptyListVal}
 
 Exception : NullPointerException                  {NullPointer}
           | StreamsNotInitialisedException        {StreamsNotIntialised}
           | NotExistingStreamConsumptionException {NotExistingStreamConsumption}
           | DivideByZeroException                 {DivideByZero}
           | TrapException                         {Trap}
+          | ListEmptyException                    {ListEmpty}
 
 Type : boolT             {BoolT}
      | intT              {IntT}
      | void              {VoidT}
+     | unit              {UnitT}
+     | '[' Type ']'      {ListT $2}
+     | Type '->' Type    {ArrowT $1 $3}   
+     | '(' Type ')'      {$2}
 
 {
 parseError :: [Token] -> a
@@ -153,6 +181,15 @@ data Stmt = Stmt Stmt Stmt
                | AndOp Stmt Stmt
                | NegateOp Stmt
                | NotOp Stmt
+               | LamExpr Type String Stmt
+               | Application Stmt Stmt
+               | UnitVal
+               | HeadOp Stmt
+               | TailOp Stmt
+               | IsEmptyOp Stmt
+               | ConsOp Stmt Stmt
+               | EmptyListVal
+               | ReturnOp Stmt
                deriving (Show)
 
 data ExceptionType = NullPointer
@@ -160,6 +197,7 @@ data ExceptionType = NullPointer
                | NotExistingStreamConsumption
                | DivideByZero
                | Trap
+               | ListEmpty
                deriving (Show)
 
 
@@ -167,6 +205,10 @@ data Type     = IntT
               | BoolT
               | VoidT
               | StmtT
+              | UnitT
+              | ListT Type
+              | EmptyListT
+              | ArrowT Type Type
               deriving (Show, Eq)
 
 

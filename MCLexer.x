@@ -26,6 +26,10 @@ tokens :-
   try     {\p s -> MkToken p TokenTry}
   catch   {\p s -> MkToken p TokenCatch}
   throw   {\p s -> MkToken p TokenThrow }
+  head    {\p s -> MkToken p TokenHead}
+  tail    {\p s -> MkToken p TokenTail}
+  isEmpty {\p s -> MkToken p TokenIsEmpty}
+  cons    {\p s -> MkToken p TokenCons}
   "="     {\p s -> MkToken p TokenEq }
   "<"     {\p s -> MkToken p TokenLessThan }
   "<="    {\p s -> MkToken p TokenLessThanEq }
@@ -47,11 +51,18 @@ tokens :-
   ")"     {\p s -> MkToken p TokenRParen }
   "{"     {\p s -> MkToken p TokenLCurly }
   "}"     {\p s -> MkToken p TokenRCurly}
+  "["     {\p s -> MkToken p TokenLSquare}
+  "]"     {\p s -> MkToken p TokenRSquare}
+  \\      {\p s -> MkToken p TokenLambda}
+  "->"    {\p s -> MkToken p TokenArrow}
+  "()"    {\p s -> MkToken p TokenUnit}
+  return  {\p s -> MkToken p TokenReturn}
   NullPointerException                    {\p s -> MkToken p TokenNPE}
   StreamsNotInitialisedException          {\p s -> MkToken p TokenSNIE}
   NotExistingStreamConsumptionException   {\p s -> MkToken p TokenNESCE}
   DivideByZeroException                   {\p s -> MkToken p TokenDBZE}
   TrapException                           {\p s -> MkToken p TokenTE}
+  ListEmptyException                      {\p s -> MkToken p TokenLEE}
   $alpha [$alpha $digit \_ \’]*           {\p s -> MkToken p (TokenVar s)}
 {
 
@@ -100,7 +111,18 @@ data TokenClass =
   TokenSNIE                   |
   TokenNESCE                  |
   TokenDBZE                   |
-  TokenTE
+  TokenTE                     |
+  TokenLEE                    |
+  TokenLambda                 |
+  TokenArrow                  |
+  TokenUnit                   |
+  TokenLSquare                |
+  TokenRSquare                |
+  TokenHead                   |
+  TokenTail                   |
+  TokenIsEmpty                |
+  TokenCons                   |
+  TokenReturn
     deriving (Show,Eq)
 
 

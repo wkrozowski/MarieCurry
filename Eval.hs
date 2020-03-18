@@ -7,6 +7,7 @@ module Eval(runProgram, convert, Code) where
 --v ::= n | true | false | loc
 
 import qualified Data.Map as Map
+import Data.List 
 import System.IO (isEOF)
 import Data.Bits(xor)
 import MCParser
@@ -23,11 +24,15 @@ data ExceptionCodeType =
     | NotExistingStreamConsumptionException
     | DivideByZeroException
     | TrapException
+    | ListEmptyException
          deriving (Eq, Show)
 
 data UnaryOpType =
               Negate
             | LogicalNot
+            | Head
+            | Tail
+            | ListIsEmpty
                 deriving (Eq, Show) 
 
 data OpType = 
@@ -45,6 +50,7 @@ data OpType =
             | LogicalAnd
             | LogicalXor
             | LogicalOr
+            | ListCons
                  deriving (Eq, Show)
 
 
@@ -66,10 +72,28 @@ data Code =   Null
             | Throw ExceptionCodeType
             | TryCatch ExceptionCodeType Code Code
             | BinOp OpType Code Code
-            | UnaryOp UnaryOpType Code 
+            | UnaryOp UnaryOpType Code
+            | Lam String Code
+            | Closure String Code Environment
+            | App Code Code
+            | Unit 
+            | List ListContents
                 deriving (Show, Eq)
 
-data Frame = Branch Code Code Environment | Then Code Environment | EvalRight OpType Code Environment | EvalOp OpType Code Environment | Assign String Environment | EvalPrint Environment | ExceptionHandler ExceptionCodeType Code Environment | EvalUnaryOp UnaryOpType Environment deriving (Show)
+data Frame =  Branch Code Code Environment 
+            | Then Code Environment 
+            | EvalRight OpType Code Environment 
+            | EvalOp OpType Code Environment 
+            | Assign String Environment 
+            | EvalPrint Environment 
+            | ExceptionHandler ExceptionCodeType Code Environment 
+            | EvalUnaryOp UnaryOpType Environment 
+            | HoleApp Code Environment 
+            | AppHole Code
+            | Global Environment
+            deriving (Show)
+
+data ListContents = Empty | Next Code ListContents deriving (Eq, Show)
 type Kontinuation = [Frame]
 
 
@@ -81,6 +105,9 @@ isValue (Void) = True
 isValue (Number _) = True
 isValue (Boolean _) = True
 isValue (Location _) = True
+isValue (Closure _ _ _) = True
+isValue (Unit) = True
+isValue (List _) = True
 isValue _ = False
 
 inject :: Code -> State
@@ -208,10 +235,31 @@ step (Exception exType, env2, store, (ExceptionHandler handlerExType catch env):
 -- There is an exception, but the correct handler is not present
 step (ex@(Exception _), env, store, _:kontinuation, buffer) = return (ex, env, store, kontinuation, buffer)
 
+-- If you see a lambda expression, convert it to closure
+step (Lam name expr, env, store, kontinuation, buffer) = return (Closure name expr env, env, store, kontinuation, buffer)
+
+-- Rule for evaluating applications - evaluate lhs first
+step ((App e1 e2),env,store, kontinuation, buffer) = return (e1,env, store, (HoleApp e2 env) : kontinuation, buffer)
+
+-- Rule for evaluating applications - lhs is a closure
+step (w@(Closure x expr cloEnv),env1,store, (HoleApp e env2):k, buffer ) = return (e, env2, store, (AppHole w) : k, buffer)
+
+-- Perform substitution - and restore the environment in the end - shadow the global bindings with current binding
+step (w,env1,store,(AppHole (Closure x e env2) ) : k, buffer ) | isValue w  = return (e, newEnv, newStore, (Global env1):k, buffer)
+    where
+        location = (freshLocation store)
+        newStore = Map.insert location w store
+        newEnv = Map.insert x location env2
+
+-- Performed full evaluation, but kontinuation contains old global bindings
+step (v, env2, store, (Global env):kontinuation, buffer) = return (v, env, store, kontinuation, buffer)
+
 -- For terminal states, evaluated to value, no continuation, just return itself
 step state@(v, _, _, [], _) | isValue v = return state
 
 step _ = error "not implemented yet"
+
+
 
 -- Core function for evaluating binary operations
 evalBinop :: OpType -> Code -> Code -> Code
@@ -232,11 +280,20 @@ evalBinop GreaterThan (Number m) (Number n) = (Boolean (m>n))
 evalBinop LogicalAnd (Boolean m) (Boolean n) = (Boolean (m && n))
 evalBinop LogicalOr (Boolean m) (Boolean n) = (Boolean (m || n))
 evalBinop LogicalXor (Boolean m) (Boolean n) = (Boolean (xor m n))
+evalBinop ListCons (v) (List contents) | isValue v = List (Next v contents)
 evalBinop a b c = error ("not valid" ++ (show a) ++ " " ++ (show b) ++ " " ++ (show c))
 
 evalUnary :: UnaryOpType -> Code -> Code
 evalUnary LogicalNot (Boolean m) = (Boolean (not m))
 evalUnary Negate (Number m) = (Number (-m))
+evalUnary Head (List (Next val _)) = val
+evalUnary Head (List Empty) = (Exception ListEmptyException)
+evalUnary Tail (List (Next h tail)) = List tail
+evalUnary Tail (List Empty) = (Exception ListEmptyException)
+evalUnary ListIsEmpty (List Empty) = (Boolean True)
+evalUnary ListIsEmpty (List _) = (Boolean False)
+
+
 evalUnary _ _ = error "not valid"
 
 -- Allows printing values to output stream
@@ -308,12 +365,15 @@ convertException (StreamsNotIntialised) = StreamsNotInitialisedException
 convertException NotExistingStreamConsumption = NotExistingStreamConsumptionException
 convertException DivideByZero = DivideByZeroException
 convertException Trap = TrapException
+convertException ListEmpty = ListEmptyException
 
 
 -- Converts type checked output from parser to bytecode
 convert :: Stmt -> Code
 convert (Stmt a as) = (Statement (convert a) (convert as))
 convert (NumVal n) = (Number n)
+convert (UnitVal) = (Unit)
+convert (EmptyListVal) = (List Empty)
 convert (BoolVal b) = (Boolean b)
 convert (Variable v) = (Reference v)
 -- this one needs fixing
@@ -333,6 +393,7 @@ convert (LessThanOp lhs rhs) = (BinOp LessThan (convert lhs) (convert rhs))
 convert (LessThanEqOp lhs rhs) = (BinOp LessOrEqual (convert lhs) (convert rhs))
 convert (GreaterThanOp lhs rhs) = (BinOp GreaterThan (convert lhs) (convert rhs))
 convert (GreaterThanEqOp lhs rhs) = (BinOp GreaterOrEqual (convert lhs) (convert rhs))
+convert (ConsOp lhs rhs) = (BinOp ListCons (convert lhs) (convert rhs))
 -- Fix typo in the name
 convert (SubtractOp lhs rhs) = (BinOp Substract (convert lhs) (convert rhs))
 convert (ModuloOp lhs rhs) = (BinOp Modulo (convert lhs) (convert rhs))
@@ -344,7 +405,12 @@ convert (OrOp lhs rhs) = (BinOp LogicalOr (convert lhs) (convert rhs))
 convert (AndOp lhs rhs) = (BinOp LogicalAnd (convert lhs) (convert rhs))
 convert (NegateOp v) = (UnaryOp Negate (convert v))
 convert (NotOp v) = (UnaryOp LogicalNot (convert v))
-
+convert (HeadOp v) = (UnaryOp Head (convert v))
+convert (TailOp v) = (UnaryOp Tail (convert v))
+convert (IsEmptyOp v) = (UnaryOp ListIsEmpty (convert v))
+convert (LamExpr _ var expr) = (Lam var (convert expr))
+convert (Application lhs rhs) = (App (convert lhs) (convert rhs))
+convert (ReturnOp v) = (convert v)
 
 
 
