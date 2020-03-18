@@ -167,3 +167,5 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (ConsOp lhs rhs) env 
         | ListT (check lhs env) == (check rhs env) = (check rhs env)
         | isCorrectType (check lhs env) && (check rhs env)== EmptyListT = ListT (check lhs env)
+
+    check _ env = error "Type error"

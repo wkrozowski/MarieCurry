@@ -92,6 +92,7 @@ Expression : Operation                      {$1}
            | consume Expression             {ConsumeStream $2}
            | streams Expression             {Streams $2}
            | return Expression              {ReturnOp $2}
+           | return unit                    {ReturnOp UnitVal}
            | throw Exception                {ThrowStmt $2}
            | lambda '(' Type var ')' '->' Compound_Stmt  {LamExpr $3 $4 $7}
            | lambda unit '->' Compound_Stmt {LamExpr UnitT "()" $4} 
