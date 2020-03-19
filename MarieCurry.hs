@@ -6,7 +6,7 @@
     import MCParser
     import TypeCheck
     import Eval
-    
+
     makeStrict (a, b) = seq a (seq b (a, b))
 
 
@@ -18,9 +18,14 @@
         path <- getArgs
         return (head path)
 
+    stdError :: String -> IO ()
+    stdError string = hPutStrLn stderr string
+
     main :: IO ()
     main = do
         file <- getFilename
         contents <- readFile file
-        runProgram $ fst $ runChecker $ parse $ (alexScanTokens contents)
-        return ()
+        catch (runProgram $ fst $ runChecker $ parse $ (alexScanTokens contents)) handler
+          where
+            handler :: SomeException -> IO ()
+            handler ex = stdError $ show ex

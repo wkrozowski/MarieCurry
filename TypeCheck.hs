@@ -43,7 +43,7 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (Stmt (Declaration varType varName) (ReturnOp v)) env  = (check v ((varName, varType):env))
 
     check (Stmt (Declaration varType varName) p@(Stmt q r)) env  = (check p ((varName, varType):env))
-    
+
     check (Stmt (Declaration varType varName) rest) env | isCorrectType (check (rest) ((varName, varType):env)) = StmtT
 
     check (Stmt p (ReturnOp v) ) env | isCorrectType (check p env) = check v env
@@ -51,8 +51,8 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (Stmt p q@(Stmt r s)) env | isCorrectType (check p env) = check q env
 
     check (Stmt p q) env | isCorrectType (check p env) && isCorrectType (check q env) = StmtT
-        
-    check (Streams v) env 
+
+    check (Streams v) env
         | (check v env == IntT) = VoidT
 
     check (ConsumeStream v) env
@@ -65,7 +65,7 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | check (Variable name) env == check val env = VoidT
         | isList (check (Variable name) env) && (check val env == EmptyListT) = VoidT
         | otherwise = throw (TypeException "Type mismatch while assigning value to variable")
-        
+
     check (IfStmt cond branch) env
         | check cond env == BoolT = check branch env
 
@@ -110,20 +110,20 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (DivideOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
-                
+
     check (EqualOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
         | check lhs env == BoolT && check rhs env == BoolT = BoolT
 
     check (NotEqualOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
-        | check lhs env == BoolT && check rhs env == BoolT = BoolT    
+        | check lhs env == BoolT && check rhs env == BoolT = BoolT
 
     check (OrOp  lhs rhs) env
-        | check lhs env == BoolT && check rhs env == BoolT = BoolT    
+        | check lhs env == BoolT && check rhs env == BoolT = BoolT
 
     check (AndOp  lhs rhs) env
-        | check lhs env == BoolT && check rhs env == BoolT = BoolT   
+        | check lhs env == BoolT && check rhs env == BoolT = BoolT
 
     check (NegateOp v) env
         | check v env == IntT = IntT
@@ -132,17 +132,17 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | check v env == BoolT = BoolT
 
     check (UnitVal) env = UnitT
-    
+
     check (EmptyListVal) env = EmptyListT
 
     check (ReturnOp v) env = check v env
 
-    check (HeadOp EmptyListVal) env = error "Consuming from empty list - cannot deduce type"
+    check (HeadOp EmptyListVal) env = errorWithoutStackTrace "Consuming from empty list - cannot deduce type"
 
-    check (HeadOp x) env = 
+    check (HeadOp x) env =
         let (ListT t)=(check x env) in t
-        
-    check (TailOp EmptyListVal) env = error "Taking tail of empty list"
+
+    check (TailOp EmptyListVal) env = errorWithoutStackTrace "Taking tail of empty list"
 
     check (TailOp x) env
         | isList typeOfX = typeOfX
@@ -156,16 +156,16 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (LamExpr t x stmt) env = ArrowT t (check stmt ((x,t):env))
 
     check (Application e1 e2) env = case e1Type of
-        (ArrowT t u) -> if (e2Type==t) then u else 
-            if (e2Type==EmptyListT) && (isList t) then u else error "Type mismatch when applying function"
-        _ -> error "Cannot apply value to non-function"
+        (ArrowT t u) -> if (e2Type==t) then u else
+            if (e2Type==EmptyListT) && (isList t) then u else errorWithoutStackTrace "Type mismatch when applying function"
+        _ -> errorWithoutStackTrace "Cannot apply value to non-function"
         where
             e1Type = check e1 env
             e2Type = check e2 env
 
     check (ConsOp lhs EmptyListVal) env | isCorrectType (check lhs env) = ListT (check lhs env)
-    check (ConsOp lhs rhs) env 
+    check (ConsOp lhs rhs) env
         | ListT (check lhs env) == (check rhs env) = (check rhs env)
         | isCorrectType (check lhs env) && (check rhs env)== EmptyListT = ListT (check lhs env)
 
-    check _ env = error "Type error"
+    check _ env = errorWithoutStackTrace "Type error"

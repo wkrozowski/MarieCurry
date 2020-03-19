@@ -51,8 +51,8 @@ import MCLexer
       consume         { MkToken _ TokenConsume}
       streams         { MkToken _ TokenInitStreams}
       lambda          { MkToken _ TokenLambda}
-      '->'            { MkToken _ TokenArrow}   
-      unit            { MkToken _ TokenUnit}   
+      '->'            { MkToken _ TokenArrow}
+      unit            { MkToken _ TokenUnit}
       return          { MkToken _ TokenReturn}
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
@@ -95,7 +95,7 @@ Expression : Operation                      {$1}
            | return unit                    {ReturnOp UnitVal}
            | throw Exception                {ThrowStmt $2}
            | lambda '(' Type var ')' '->' Compound_Stmt  {LamExpr $3 $4 $7}
-           | lambda unit '->' Compound_Stmt {LamExpr UnitT "()" $4} 
+           | lambda unit '->' Compound_Stmt {LamExpr UnitT "()" $4}
 
 Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | Operation '-'  Operation     {SubtractOp $1 $3}
@@ -120,7 +120,7 @@ Operation      : Operation '+'  Operation     {AddOp $1 $3}
 
 Exp1           : Exp1 Exp2                    {Application $1 $2}
                | Exp1 unit                    {Application $1 UnitVal}
-               | Exp2                         {$1}               
+               | Exp2                         {$1}
 
 
 Exp2 : '(' Expression ')'                                                  {$2}
@@ -141,16 +141,10 @@ Type : boolT             {BoolT}
      | void              {VoidT}
      | unit              {UnitT}
      | '[' Type ']'      {ListT $2}
-     | Type '->' Type    {ArrowT $1 $3}   
+     | Type '->' Type    {ArrowT $1 $3}
      | '(' Type ')'      {$2}
 
 {
-parseError :: [Token] -> a
-parseError input = error ("error parsing in line " ++ (show line) ++ " column " ++ (show column))
-    where
-        line = fst position
-        column = snd position
-        position = tokenPosn $ head input
 
 
 data Stmt = Stmt Stmt Stmt
@@ -212,6 +206,11 @@ data Type     = IntT
               | ArrowT Type Type
               deriving (Show, Eq)
 
-
-
+parseError :: [Token] -> a
+parseError input = errorWithoutStackTrace ("error parsing at line " ++ (show line) ++ " column " ++ (show column))
+    where
+        line = fst position
+        column = snd position
+        position = tokenPosn firstToken
+        firstToken = head input
 }
