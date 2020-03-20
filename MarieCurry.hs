@@ -6,6 +6,7 @@
     import MCParser
     import TypeCheck
     import Eval
+    import SyntaxCheck
 
     makeStrict (a, b) = seq a (seq b (a, b))
 
@@ -25,7 +26,7 @@
     main = do
         file <- getFilename
         contents <- readFile file
-        catch (runProgram $ fst $ runChecker $ parse $ (alexScanTokens contents)) handler
+        catch (runProgram $ fst $ runChecker $ parse $ checkSyntax (alexScanTokens contents) []) handler
           where
             handler :: SomeException -> IO ()
             handler ex = stdError $ show ex
