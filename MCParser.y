@@ -219,6 +219,5 @@ parseErrorMessage li col =  "Error parsing around line: " ++ (show li) ++ " colu
 
 guessCauseOfError :: [TokenClass] -> String
 guessCauseOfError (TokenLCurly : tks) = "You have probably forgotten ')' or '->'"
-guessCauseofError ()
 guessCauseOfError _ = "You might have forgotten ';' in the previous statement"
 }
