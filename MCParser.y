@@ -1,6 +1,7 @@
 {
 module MCParser where
 import MCLexer
+import SyntaxCheck
 }
 %name parse
 %tokentype { Token }
@@ -206,11 +207,18 @@ data Type     = IntT
               | ArrowT Type Type
               deriving (Show, Eq)
 
+
 parseError :: [Token] -> a
-parseError input = errorWithoutStackTrace ("error parsing at line " ++ (show line) ++ " column " ++ (show column))
-    where
-        line = fst position
-        column = snd position
-        position = tokenPosn firstToken
-        firstToken = head input
+parseError input = errorWithoutStackTrace (parseErrorMessage (line token) (column token) ++ "\n" ++ guessCauseOfError tokenClasses)
+  where
+    token = head input
+    tokenClasses = map extractTokenClass input
+
+parseErrorMessage :: Int -> Int -> String
+parseErrorMessage li col =  "Error parsing around line: " ++ (show li) ++ " column: " ++ (show col)
+
+guessCauseOfError :: [TokenClass] -> String
+guessCauseOfError (TokenLCurly : tks) = "You have probably forgotten ')' or '->'"
+guessCauseofError ()
+guessCauseOfError _ = "You might have forgotten ';' in the previous statement"
 }
