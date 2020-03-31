@@ -19,6 +19,7 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     isCorrectType (BoolT) = True
     isCorrectType (StmtT) = True
     isCorrectType (VoidT) = True
+    isCorrectType (StringT) = True
     isCorrectType (ArrowT l r) = (isCorrectType l) && (isCorrectType r)
     isCorrectType (UnitT) = True
     isCorrectType (ListT t) = isCorrectType t
@@ -35,6 +36,8 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (BoolVal _) _ = BoolT
 
     check (NumVal _) _ = IntT
+
+    check (StringVal _) _ = StringT
 
     check (Variable name) env = case envLookup name env of
             Just n -> n
@@ -78,6 +81,7 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (PrintOp v) env
         | (check v env) == IntT = VoidT
         | (check v env) == BoolT = VoidT
+        | (check v env) == StringT = VoidT
 
     check (ThrowStmt _) env = VoidT
 
@@ -86,6 +90,12 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (AddOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
+        | check lhs env == StringT && check rhs env == IntT = StringT
+        | check lhs env == StringT && check rhs env == StringT = StringT
+        | check lhs env == IntT && check rhs env == StringT = StringT
+        | check lhs env == StringT && check rhs env == BoolT = StringT
+        | check lhs env == BoolT && check rhs env == StringT = StringT
+
 
     check (LessThanOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT  = BoolT
@@ -114,6 +124,8 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (EqualOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
         | check lhs env == BoolT && check rhs env == BoolT = BoolT
+        | check lhs env == StringT && check rhs env == StringT = BoolT
+
 
     check (NotEqualOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT

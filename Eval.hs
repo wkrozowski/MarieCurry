@@ -59,6 +59,7 @@ data Code =   Null
             | Exception ExceptionCodeType
             | Number Int
             | Boolean Bool
+            | String String
             | Location Address
             | Reference String
             | While Code Code
@@ -126,6 +127,7 @@ isValue :: Code -> Bool
 isValue (Void) = True
 isValue (Number _) = True
 isValue (Boolean _) = True
+isValue (String _) = True
 isValue (Location _) = True
 isValue (Closure _ _ _) = True
 isValue (Unit) = True
@@ -286,6 +288,11 @@ step _ = errorWithoutStackTrace "not implemented yet"
 -- Core function for evaluating binary operations
 evalBinop :: OpType -> Code -> Code -> Code
 evalBinop Add (Number m) (Number n) = (Number (n+m))
+evalBinop Add (String m) (String n) = (String (m ++ n))
+evalBinop Add (Number m) (String n) = (String (show(m) ++ n))
+evalBinop Add (String m) (Number n) = (String (m ++ show(n)))
+evalBinop Add (String m) (Boolean n) = (String (m ++ show(n)))
+evalBinop Add (Boolean m) (String n) = (String (show(m) ++ n))
 evalBinop Multiply (Number m) (Number n) = (Number (m*n))
 evalBinop Substract (Number m) (Number n) = (Number (m-n))
 evalBinop Divide (Number m) (Number 0) = (Exception DivideByZeroException)
@@ -295,6 +302,7 @@ evalBinop LessThan (Number m) (Number n) = (Boolean (m<n))
 evalBinop LessOrEqual (Number m) (Number n) = (Boolean (m<=n))
 evalBinop Equal (Number m) (Number n) = (Boolean (m==n))
 evalBinop Equal (Boolean m) (Boolean n) = (Boolean (m==n))
+evalBinop Equal (String m) (String n) = (Boolean (m==n))
 evalBinop NotEqual (Number m) (Number n) = (Boolean (m/=n))
 evalBinop NotEqual (Boolean m) (Boolean n) = (Boolean (m/=n))
 evalBinop GreaterOrEqual (Number m) (Number n) = (Boolean (m>=n))
@@ -321,6 +329,7 @@ evalUnary _ _ = errorWithoutStackTrace "not valid"
 -- Allows printing values to output stream
 valueToString :: Code -> String
 valueToString (Number n) = show n
+valueToString (String n) = n
 valueToString (Boolean True) = "True"
 valueToString (Boolean False) = "False"
 valueToString _ = errorWithoutStackTrace "inpossible to print"
@@ -394,6 +403,7 @@ convertException ListEmpty = ListEmptyException
 convert :: Stmt -> Code
 convert (Stmt a as) = (Statement (convert a) (convert as))
 convert (NumVal n) = (Number n)
+convert (StringVal n) = (String n)
 convert (UnitVal) = (Unit)
 convert (EmptyListVal) = (List Empty)
 convert (BoolVal b) = (Boolean b)

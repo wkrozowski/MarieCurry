@@ -15,7 +15,8 @@ tokens :-
   true    {\p s -> MkToken p (TokenBool True)}
   false   {\p s -> MkToken p (TokenBool False)}
   int     {\p s -> MkToken p TokenTInt }
-  bool    {\p s -> MkToken p TokenTBool }
+  bool    {\p s -> MkToken p TokenTBool}
+  string  {\p s -> MkToken p TokenTString}
   void    {\p s -> MkToken p TokenVoid }
   if      {\p s -> MkToken p TokenIf }
   else    {\p s -> MkToken p TokenElse }
@@ -30,6 +31,7 @@ tokens :-
   tail    {\p s -> MkToken p TokenTail}
   isEmpty {\p s -> MkToken p TokenIsEmpty}
   cons    {\p s -> MkToken p TokenCons}
+  \"      {\p s -> MkToken p TokenQuote}
   "="     {\p s -> MkToken p TokenEq }
   "<"     {\p s -> MkToken p TokenLessThan }
   "<="    {\p s -> MkToken p TokenLessThanEq }
@@ -64,6 +66,7 @@ tokens :-
   TrapException                           {\p s -> MkToken p TokenTE}
   ListEmptyException                      {\p s -> MkToken p TokenLEE}
   $alpha [$alpha $digit \_ \’]*           {\p s -> MkToken p (TokenVar s)}
+
 {
 
 -- The token type:
@@ -122,9 +125,10 @@ data TokenClass =
   TokenTail                   |
   TokenIsEmpty                |
   TokenCons                   |
-  TokenReturn
+  TokenReturn                 |
+  TokenQuote                  |
+  TokenTString
     deriving (Show,Eq)
-
 
 tokenPosn :: Token -> (Int, Int)
 tokenPosn (MkToken (AlexPn _ line col) _) = (line, col)

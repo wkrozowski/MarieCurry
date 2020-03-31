@@ -42,6 +42,7 @@ import SyntaxCheck
       intT            { MkToken _ TokenTInt}
       bool            { MkToken _ (TokenBool $$)}
       boolT           { MkToken _ TokenTBool}
+      stringT         { MkToken _ TokenTString}
       void            { MkToken _ TokenVoid}
       var             { MkToken _ (TokenVar $$)}
       print           { MkToken _ TokenPrint}
@@ -55,6 +56,7 @@ import SyntaxCheck
       '->'            { MkToken _ TokenArrow}
       unit            { MkToken _ TokenUnit}
       return          { MkToken _ TokenReturn}
+      quote           { MkToken _ TokenQuote}
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}
@@ -125,6 +127,7 @@ Exp1           : Exp1 Exp2                    {Application $1 $2}
 
 
 Exp2 : '(' Expression ')'                                                  {$2}
+     | quote var quote                                                    {StringVal $2}
      | var                                                                {Variable $1}
      | bool                                                               {BoolVal $1}
      | number                                                             {NumVal $1}
@@ -141,6 +144,7 @@ Type : boolT             {BoolT}
      | intT              {IntT}
      | void              {VoidT}
      | unit              {UnitT}
+     | stringT            {StringT}
      | '[' Type ']'      {ListT $2}
      | Type '->' Type    {ArrowT $1 $3}
      | '(' Type ')'      {$2}
@@ -159,6 +163,7 @@ data Stmt = Stmt Stmt Stmt
                | Variable String
                | NumVal Int
                | Streams Stmt
+               | StringVal String
                | ConsumeStream Stmt
                | TryCatchStmt Stmt ExceptionType Stmt
                | ThrowStmt ExceptionType
@@ -202,6 +207,7 @@ data Type     = IntT
               | VoidT
               | StmtT
               | UnitT
+              | StringT
               | ListT Type
               | EmptyListT
               | ArrowT Type Type
