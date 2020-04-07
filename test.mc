@@ -1,50 +1,63 @@
-[int]->(int->int)->[int] map;
+[int]->(int->int)->[int] mapInt;
 
-map = \([int] list) -> {
+mapInt = \([int] list) -> {
 	\(int->int fun) -> {
 		if(isEmpty list) {
 			return [];
 		}
 		else {
-			return (fun (head list)) cons (map (tail list) fun);
+			return (fun (head list)) cons (mapInt (tail list) fun);
 		}
 	};
 };
 
-[int] -> (int -> ()) -> () forEach;
-forEach = \([int] list) -> {
+[int] -> (int -> ()) -> () forEachInt;
+forEachInt = \([int] list) -> {
 	\(int->() fun) -> {
 		if (isEmpty list) {
 			return ();
 		}
 		else {
 			fun (head list);
-			return forEach (tail list) fun;
+			return forEachInt (tail list) fun;
 		}
 	};
 }; 
 
-int -> () printFun;
-printFun = \(int x) -> {
+[char] -> (char -> ()) -> () forEachChar;
+forEachChar = \([char] list) -> {
+	\(char->() fun) -> {
+		if (isEmpty list) {
+			return ();
+		}
+		else {
+			fun (head list);
+			return forEachChar (tail list) fun;
+		}
+	};
+}; 
+
+int -> () printInt;
+printInt = \(int x) -> {
 	print x;
 	return ();
 };
 
-() -> void exampleUnitFun;
-exampleUnitFun = \() -> {
-	print 1234;
-}; 
-
-exampleUnitFun ();
-
-[int] testList;
-testList = 5 cons (6 cons (7 cons []));
-
-int->int testFun;
-testFun = \(int x)-> {
-	x+1;
+char -> () printChar;
+printChar = \(char x) -> {
+	print x;
+	return ();
 };
 
-testList = map testList testFun;
+[char] -> [char] -> [char] concat;
+concat = \([char] lhs) -> {
+	\([char] rhs) -> {
+		if (isEmpty lhs) {
+			return rhs;
+		} else {
+			return ((head lhs) cons (concat (tail lhs) rhs));
+		}
+	};
+};
 
-forEach testList printFun;
+forEachChar "hello" printChar;

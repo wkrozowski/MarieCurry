@@ -60,6 +60,7 @@ data Code =   Null
             | Number Int
             | Boolean Bool
             | String String
+            | Character Char
             | Location Address
             | Reference String
             | While Code Code
@@ -127,7 +128,7 @@ isValue :: Code -> Bool
 isValue (Void) = True
 isValue (Number _) = True
 isValue (Boolean _) = True
-isValue (String _) = True
+isValue (Character _) = True
 isValue (Location _) = True
 isValue (Closure _ _ _) = True
 isValue (Unit) = True
@@ -288,11 +289,6 @@ step _ = errorWithoutStackTrace "not implemented yet"
 -- Core function for evaluating binary operations
 evalBinop :: OpType -> Code -> Code -> Code
 evalBinop Add (Number m) (Number n) = (Number (n+m))
-evalBinop Add (String m) (String n) = (String (m ++ n))
-evalBinop Add (Number m) (String n) = (String (show(m) ++ n))
-evalBinop Add (String m) (Number n) = (String (m ++ show(n)))
-evalBinop Add (String m) (Boolean n) = (String (m ++ show(n)))
-evalBinop Add (Boolean m) (String n) = (String (show(m) ++ n))
 evalBinop Multiply (Number m) (Number n) = (Number (m*n))
 evalBinop Substract (Number m) (Number n) = (Number (m-n))
 evalBinop Divide (Number m) (Number 0) = (Exception DivideByZeroException)
@@ -311,7 +307,7 @@ evalBinop LogicalAnd (Boolean m) (Boolean n) = (Boolean (m && n))
 evalBinop LogicalOr (Boolean m) (Boolean n) = (Boolean (m || n))
 evalBinop LogicalXor (Boolean m) (Boolean n) = (Boolean (xor m n))
 evalBinop ListCons (v) (List contents) | isValue v = List (Next v contents)
-evalBinop a b c = errorWithoutStackTrace ("not valid" ++ (show a) ++ " " ++ (show b) ++ " " ++ (show c))
+evalBinop a b c = errorWithoutStackTrace ("not valid operation: " ++ (show a) ++ " called with arguments: " ++ (show b) ++ " and " ++ (show c))
 
 evalUnary :: UnaryOpType -> Code -> Code
 evalUnary LogicalNot (Boolean m) = (Boolean (not m))
@@ -332,6 +328,9 @@ valueToString (Number n) = show n
 valueToString (String n) = n
 valueToString (Boolean True) = "True"
 valueToString (Boolean False) = "False"
+valueToString (List (Empty)) = ""
+valueToString (Character c) = [c]
+valueToString (List (Next (Character c) cs)) = ([c])++(valueToString (List cs))
 valueToString _ = errorWithoutStackTrace "inpossible to print"
 
 -- Is it a terminals state
@@ -390,6 +389,10 @@ consumeStream n (xs:xss) = appendAtFront (consumeStream (n-1) (xss)) xs
 consumeStream _ _ = errorWithoutStackTrace "cannot consume from empty stream"
 
 
+convertString :: String -> ListContents
+convertString "" = Empty
+convertString (a:as) = (Next (Character a) (convertString as))
+
 convertException :: ExceptionType -> ExceptionCodeType
 convertException (NullPointer) = NullPointerException
 convertException (StreamsNotIntialised) = StreamsNotInitialisedException
@@ -403,7 +406,7 @@ convertException ListEmpty = ListEmptyException
 convert :: Stmt -> Code
 convert (Stmt a as) = (Statement (convert a) (convert as))
 convert (NumVal n) = (Number n)
-convert (StringVal n) = (String n)
+convert (StringVal n) = (List (convertString n))
 convert (UnitVal) = (Unit)
 convert (EmptyListVal) = (List Empty)
 convert (BoolVal b) = (Boolean b)
@@ -443,12 +446,3 @@ convert (IsEmptyOp v) = (UnaryOp ListIsEmpty (convert v))
 convert (LamExpr _ var expr) = (Lam var (convert expr))
 convert (Application lhs rhs) = (App (convert lhs) (convert rhs))
 convert (ReturnOp v) = (convert v)
-
-
-
-
--- -- Runs the code for the hardcoded first task
--- main :: IO ()
--- main = do
---     runProgram $ Statement (InitStreams 2) (While (Boolean True) (Statement (Statement (Print (Consume 0)) (Print (Consume 0))) (Print (Consume 1))))
---     return ()

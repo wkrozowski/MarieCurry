@@ -16,8 +16,8 @@ tokens :-
   false   {\p s -> MkToken p (TokenBool False)}
   int     {\p s -> MkToken p TokenTInt }
   bool    {\p s -> MkToken p TokenTBool}
-  string  {\p s -> MkToken p TokenTString}
   void    {\p s -> MkToken p TokenVoid }
+  char    {\p s -> MkToken p TokenTChar}
   if      {\p s -> MkToken p TokenIf }
   else    {\p s -> MkToken p TokenElse }
   while   {\p s -> MkToken p TokenWhile }
@@ -127,7 +127,7 @@ data TokenClass =
   TokenCons                   |
   TokenReturn                 |
   TokenQuote                  |
-  TokenTString
+  TokenTChar                  
     deriving (Show,Eq)
 
 tokenPosn :: Token -> (Int, Int)

@@ -40,9 +40,9 @@ import SyntaxCheck
       throw           { MkToken _ TokenThrow}
       number          { MkToken _ (TokenNum $$)}
       intT            { MkToken _ TokenTInt}
+      char            { MkToken _ TokenTChar}
       bool            { MkToken _ (TokenBool $$)}
       boolT           { MkToken _ TokenTBool}
-      stringT         { MkToken _ TokenTString}
       void            { MkToken _ TokenVoid}
       var             { MkToken _ (TokenVar $$)}
       print           { MkToken _ TokenPrint}
@@ -143,8 +143,8 @@ Exception : NullPointerException                  {NullPointer}
 Type : boolT             {BoolT}
      | intT              {IntT}
      | void              {VoidT}
+     | char              {CharT}
      | unit              {UnitT}
-     | stringT            {StringT}
      | '[' Type ']'      {ListT $2}
      | Type '->' Type    {ArrowT $1 $3}
      | '(' Type ')'      {$2}
@@ -201,7 +201,6 @@ data ExceptionType = NullPointer
                | ListEmpty
                deriving (Show)
 
-
 data Type     = IntT
               | BoolT
               | VoidT
@@ -211,6 +210,7 @@ data Type     = IntT
               | ListT Type
               | EmptyListT
               | ArrowT Type Type
+              | CharT
               deriving (Show, Eq)
 
 

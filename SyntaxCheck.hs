@@ -116,7 +116,6 @@ tokenToString (MkToken _ TokenArrow)= "->"
 tokenToString (MkToken _ TokenUnit)= "()"
 tokenToString (MkToken _ TokenReturn)= "return"
 
-
 line :: Token -> Int
 line token = fst tokenPosition
   where
