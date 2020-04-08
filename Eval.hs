@@ -38,7 +38,7 @@ data UnaryOpType =
 data OpType =
               Add
             | Multiply
-            | Substract
+            | Subtract
             | Divide
             | Modulo
             | LessThan
@@ -69,7 +69,7 @@ data Code =   Null
             | Assignment String Code
             | Statement Code Code
             | InitStreams Int
-            | Consume Int
+            | Consume Code
             | Print Code
             | Throw ExceptionCodeType
             | TryCatch ExceptionCodeType Code Code
@@ -93,6 +93,7 @@ data Frame =  Branch Code Code Environment
             | HoleApp Code Environment
             | AppHole Code
             | Global Environment
+            | EvalConsume Environment
             deriving (Show)
 
 data ListContents = Empty | Next Code ListContents deriving (Eq, Show)
@@ -162,14 +163,14 @@ step (v, env1, store, (Branch lhs rhs env2):kontinuation, buffer)
     | isValue v = case v of
         (Boolean True) -> return (lhs, env2, store, kontinuation, buffer)
         (Boolean False) -> return (rhs, env2, store, kontinuation, buffer)
-        _ -> errorWithoutStackTrace "not a boolean"
+        _ -> errorWithoutStackTrace "Not a boolean"
 
 -- Desugars while expression into if statement
 step (whileExp@(While condition exp), env, store, kontinuation, buffer) = return ((If condition (Statement exp whileExp) (Void)), env, store, kontinuation, buffer)
 
 -- Lookup location of a reference type
 step(Reference variableName, env, store, kontinuation, buffer)
-    | lookupResult == Nothing = errorWithoutStackTrace "dereferencing not existent variable"
+    | lookupResult == Nothing = errorWithoutStackTrace "Dereferencing not existent variable"
     | otherwise = let (Just v)=lookupResult in
         return (v, env, store, kontinuation, buffer)
     where lookupResult = (Map.lookup variableName env)>>= (\x -> Map.lookup x store)
@@ -182,7 +183,7 @@ step (Assignment name expr, env, store, kontinuation, buffer) = return (expr, en
 
 -- Mutation of evaluated location
 step (val, env2, store, (Assign name env):kontinuation, buffer)
-    | lookupResult == Nothing = errorWithoutStackTrace "trying to mutate not existing variable"
+    | lookupResult == Nothing = errorWithoutStackTrace "Trying to mutate not existing variable"
     | isValue val  = let (Just location)=lookupResult in
             return (Void, env, Map.insert location val store, kontinuation, buffer)
         where
@@ -220,13 +221,16 @@ step (Null, env, store, kontinuation, buffer) = return (Exception NullPointerExc
 -- Initialise buffers with empty values
 step (InitStreams numberOfStreams, env, store, kontinuation, buffer) = return (Void, env, store, kontinuation, take numberOfStreams $ repeat [])
 
+-- Evaluate the number of stream which we are going to consume from
+step (Consume expr, env, store, kontinuation, buffer) = return (expr, env, store, (EvalConsume env):kontinuation, buffer)
+
 -- Main stream operation function - when something is stored in buffer, fetch it - otherwise just read whole new line and feed it to buffer and recursively feed it to yourself
-step (Consume no, env, store, kontinuation, buffer)
-    -- ecking whether the buffer number is bigger then initial number of buffers (interplay with initBuffer operation)
+step (no@(Number num), env, store, (EvalConsume env2):kontinuation, buffer)
+    -- checking whether the buffer number is bigger then initial number of buffers (interplay with initBuffer operation)
     | buffer == [] = return (Exception StreamsNotInitialisedException, env, store, kontinuation, buffer)
-    | no > length buffer = return (Exception NotExistingStreamConsumptionException, env, store, kontinuation, buffer)
+    | num > length buffer = return (Exception NotExistingStreamConsumptionException, env, store, kontinuation, buffer)
     -- If the buffer for given stream is empty, then try fetching a new line
-    | isStreamEmpty no buffer = do
+    | isStreamEmpty num buffer = do
         done<-isEOF
         if done then
             -- Go to halting state
@@ -234,13 +238,13 @@ step (Consume no, env, store, kontinuation, buffer)
         else do
             -- Otherwise fetch a new line
             input<- getLine
-            return (Consume no, env, store, kontinuation, appendToBuffer (processInputLine input) buffer)
+            return (Consume no, env2, store, kontinuation, appendToBuffer (processInputLine input) buffer)
     -- If buffer is not empty, then just fetch from it
     | otherwise = return (Number contents, env, store, kontinuation, newBuffer)
         where
             contents = fst consumeResult
             newBuffer = snd consumeResult
-            consumeResult = consumeStream no buffer
+            consumeResult = consumeStream num buffer
 
 -- Throwing an exception
 step (Throw exType, env, store, kontinuation, buffer) = return (Exception exType, env, store, kontinuation, buffer)
@@ -282,15 +286,14 @@ step (v, env2, store, (Global env):kontinuation, buffer) = return (v, env, store
 -- For terminal states, evaluated to value, no continuation, just return itself
 step state@(v, _, _, [], _) | isValue v = return state
 
-step _ = errorWithoutStackTrace "not implemented yet"
-
+step (c, _,_,_,_) = errorWithoutStackTrace ("Error while evaluation: " ++ show c)
 
 
 -- Core function for evaluating binary operations
 evalBinop :: OpType -> Code -> Code -> Code
 evalBinop Add (Number m) (Number n) = (Number (n+m))
 evalBinop Multiply (Number m) (Number n) = (Number (m*n))
-evalBinop Substract (Number m) (Number n) = (Number (m-n))
+evalBinop Subtract (Number m) (Number n) = (Number (m-n))
 evalBinop Divide (Number m) (Number 0) = (Exception DivideByZeroException)
 evalBinop Divide (Number m) (Number n) = (Number (div m n))
 evalBinop Modulo (Number m) (Number n) = (Number (mod m n))
@@ -413,14 +416,14 @@ convert (BoolVal b) = (Boolean b)
 convert (Variable v) = (Reference v)
 -- this one needs fixing
 convert (Streams (NumVal s)) = (InitStreams s)
---
+convert (Streams _) = errorWithoutStackTrace "Streams must be initialised with a number"
 convert (PrintOp s) = (Print (convert s))
 convert (Declaration _ name) = (Definition name)
 convert (AssignmentStmt name val) = (Assignment name (convert val))
 convert (WhileStmt cond body) = (While (convert cond) (convert body))
 convert (IfStmtElse cond a b) = (If (convert cond) (convert a) (convert b))
 convert (IfStmt cond a) = (If (convert cond) (convert a) (Void))
-convert (ConsumeStream (NumVal n)) = (Consume n)
+convert (ConsumeStream (n)) = (Consume (convert n))
 convert (TryCatchStmt body ex handler) = (TryCatch  (convertException ex) (convert body) (convert handler))
 convert (ThrowStmt ex) = (Throw (convertException ex))
 convert (AddOp lhs rhs) = (BinOp Add (convert lhs) (convert rhs))
@@ -429,8 +432,7 @@ convert (LessThanEqOp lhs rhs) = (BinOp LessOrEqual (convert lhs) (convert rhs))
 convert (GreaterThanOp lhs rhs) = (BinOp GreaterThan (convert lhs) (convert rhs))
 convert (GreaterThanEqOp lhs rhs) = (BinOp GreaterOrEqual (convert lhs) (convert rhs))
 convert (ConsOp lhs rhs) = (BinOp ListCons (convert lhs) (convert rhs))
--- Fix typo in the name
-convert (SubtractOp lhs rhs) = (BinOp Substract (convert lhs) (convert rhs))
+convert (SubtractOp lhs rhs) = (BinOp Subtract (convert lhs) (convert rhs))
 convert (ModuloOp lhs rhs) = (BinOp Modulo (convert lhs) (convert rhs))
 convert (DivideOp lhs rhs) = (BinOp Divide (convert lhs) (convert rhs))
 convert (MultiplyOp lhs rhs) = (BinOp Multiply (convert lhs) (convert rhs))

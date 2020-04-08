@@ -17,7 +17,11 @@
     getFilename :: IO (String)
     getFilename = do
         path <- getArgs
-        return (head path)
+        if (path==[]) 
+        then 
+          return ("")
+        else
+          return (head path)
 
     stdError :: String -> IO ()
     stdError string = hPutStrLn stderr string

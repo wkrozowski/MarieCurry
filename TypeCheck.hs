@@ -58,12 +58,15 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (Streams v) env
         | (check v env == IntT) = VoidT
+        | otherwise = throw (TypeException "You cannot intialise streams with value which isn't a number")
 
     check (ConsumeStream v) env
         | (check v env == IntT) = IntT
+        | otherwise = throw (TypeException "You cannot consume from stream with id which isn't a number")
 
     check (WhileStmt cond body) env
         | (check cond env == BoolT) && (isCorrectType (check body env)) = VoidT
+        | otherwise = throw (TypeException "Type error in while expression")
 
     check (AssignmentStmt name val) env
         | check (Variable name) env == check val env = VoidT
@@ -72,71 +75,114 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (IfStmt cond branch) env
         | check cond env == BoolT = check branch env
+        | otherwise = throw (TypeException "Condition of if statement is a non-boolean value")
 
     check (IfStmtElse cond trueBranch falseBranch) env
         | check cond env == BoolT && (check trueBranch env)==(check falseBranch env) = (check trueBranch env)
         | check cond env == BoolT && isList (check trueBranch env) && (check falseBranch env)==EmptyListT = (check trueBranch env)
-         | check cond env == BoolT && isList (check falseBranch env) && (check trueBranch env)==EmptyListT = (check falseBranch env)
+        | check cond env == BoolT && isList (check falseBranch env) && (check trueBranch env)==EmptyListT = (check falseBranch env)
         | check cond env == BoolT && (isCorrectType (check trueBranch env)) && (isCorrectType (check falseBranch env)) = StmtT
+        | check cond env /= BoolT = throw (TypeException "Condition of the if-then-else expression is not a boolean")
+        | otherwise = throw (TypeException "Branches of if-then-else expression have not matching types")
 
     check (PrintOp v) env
         | (check v env) == IntT = VoidT
         | (check v env) == BoolT = VoidT
         | (check v env) == ListT CharT = VoidT
         | (check v env) == CharT = VoidT
+        | otherwise = throw (TypeException "Trying to print a type which is not printable")
 
     check (ThrowStmt _) env = VoidT
 
     check (TryCatchStmt tested _ handler) env
         | isCorrectType (check tested env) && isCorrectType (check handler env) = StmtT
+        | isCorrectType (check tested env) = throw (TypeException "Error in catch part of try-catch exception")
+        | otherwise = throw (TypeException "Error in try part of try-catch exception")
 
     check (AddOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
+        | check lhs env == IntT = throw (TypeException "Right hand side of addition is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of addition is not an int")
+        | otherwise = throw (TypeException "Both sides of addition have wrong types")
 
     check (LessThanOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT  = BoolT
+        | check lhs env == IntT = throw (TypeException "Right hand side of lt operation is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of lt operation is not an int")
+        | otherwise = throw (TypeException "Both sides of lt operation have wrong types")
 
     check (LessThanEqOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
+        | check lhs env == IntT = throw (TypeException "Right hand side of lt or eq operation is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of lt or eq operation is not an int")
+        | otherwise = throw (TypeException "Both sides of lt or eq operation have wrong types")
 
     check (GreaterThanOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
+        | check lhs env == IntT = throw (TypeException "Right hand side of gt operation is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of gt operation is not an int")
+        | otherwise = throw (TypeException "Both sides of gt operation have wrong types")
 
     check (GreaterThanEqOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
+        | check lhs env == IntT = throw (TypeException "Right hand side of gt or eq operation is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of gt or eq operation is not an int")
+        | otherwise = throw (TypeException "Both sides of gr or eq operation have wrong types")
 
     check (SubtractOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
+        | check lhs env == IntT = throw (TypeException "Right hand side of subtraction is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of subtraction is not an int")
+        | otherwise = throw (TypeException "Both sides of subtraction have wrong types")
 
     check (MultiplyOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
+        | check lhs env == IntT = throw (TypeException "Right hand side of multiplication is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of multiplication is not an int")
+        | otherwise = throw (TypeException "Both sides of multiplication have wrong types")
 
     check (ModuloOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
+        | check lhs env == IntT = throw (TypeException "Right hand side of modulo is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of modulo is not an int")
+        | otherwise = throw (TypeException "Both sides of modulo have wrong types")
 
     check (DivideOp lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = IntT
+        | check lhs env == IntT = throw (TypeException "Right hand side of division is not an int")
+        | check rhs env == IntT = throw (TypeException "Left hand side of division is not an int")
+        | otherwise = throw (TypeException "Both sides of division have wrong types")
 
     check (EqualOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
         | check lhs env == BoolT && check rhs env == BoolT = BoolT
         | check lhs env == StringT && check rhs env == StringT = BoolT
+        | otherwise = throw (TypeException "Type mismatch in comparision operator")
 
     check (NotEqualOp  lhs rhs) env
         | check lhs env == IntT && check rhs env == IntT = BoolT
         | check lhs env == BoolT && check rhs env == BoolT = BoolT
+        | otherwise = throw (TypeException "Type mismatch in not-equals operator")
 
     check (OrOp  lhs rhs) env
         | check lhs env == BoolT && check rhs env == BoolT = BoolT
+        | check lhs env == BoolT = throw (TypeException "Right hand side of logical or is not a bool")
+        | check rhs env == BoolT = throw (TypeException "Left hand side of logical or is not a bool")
+        | otherwise = throw (TypeException "Both sides of logical or have wrong types")
 
     check (AndOp  lhs rhs) env
         | check lhs env == BoolT && check rhs env == BoolT = BoolT
+        | check lhs env == BoolT = throw (TypeException "Right hand side of logical and is not a bool")
+        | check rhs env == BoolT = throw (TypeException "Left hand side of logical andr is not a bool")
+        | otherwise = throw (TypeException "Both sides of logical and have wrong types")
 
     check (NegateOp v) env
         | check v env == IntT = IntT
+        | otherwise = throw (TypeException "Trying to negate a value which is not a number")
 
     check (NotOp v) env
         | check v env == BoolT = BoolT
+        | otherwise = throw (TypeException "Trying to perform logical not on a value which is not a boolean")
 
     check (UnitVal) env = UnitT
 
@@ -144,17 +190,20 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (ReturnOp v) env = check v env
 
-    check (HeadOp EmptyListVal) env = errorWithoutStackTrace "Consuming from empty list - cannot deduce type"
+    check (HeadOp EmptyListVal) env = throw (TypeException "Consuming from empty list - cannot deduce type")
 
-    check (HeadOp x) env =
-        let (ListT t)=(check x env) in t
+    check (HeadOp x) env
+        | isList (check x env) =let (ListT t)=(check x env) in t
+        | otherwise = throw (TypeException "Taking head of value which isn't a list")
 
-    check (TailOp EmptyListVal) env = errorWithoutStackTrace "Taking tail of empty list"
+    check (TailOp EmptyListVal) env = throw (TypeException "Taking tail of empty list")
 
     check (TailOp x) env
         | isList typeOfX = typeOfX
+        | otherwise = throw (TypeException "Trying to take a tail from value which is not a list")
             where
                 typeOfX = (check x env)
+        
 
     check (IsEmptyOp EmptyListVal) env = BoolT
 
@@ -164,8 +213,8 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
 
     check (Application e1 e2) env = case e1Type of
         (ArrowT t u) -> if (e2Type==t) then u else
-            if (e2Type==EmptyListT) && (isList t) then u else errorWithoutStackTrace "Type mismatch when applying function"
-        _ -> errorWithoutStackTrace "Cannot apply value to non-function"
+            if (e2Type==EmptyListT) && (isList t) then u else throw (TypeException "Type mismatch when applying function")
+        _ -> throw (TypeException "Cannot apply value to non-function")
         where
             e1Type = check e1 env
             e2Type = check e2 env
@@ -174,5 +223,6 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (ConsOp lhs rhs) env
         | ListT (check lhs env) == (check rhs env) = (check rhs env)
         | isCorrectType (check lhs env) && (check rhs env)== EmptyListT = ListT (check lhs env)
+        | otherwise = throw (TypeException "Type error in list constructor")
 
-    check _ env = errorWithoutStackTrace "Type error"
+    check _ env = throw (TypeException "type error")
