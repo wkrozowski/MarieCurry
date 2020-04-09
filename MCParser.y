@@ -35,7 +35,7 @@ import SyntaxCheck
       '*'             { MkToken _ TokenMultiply}
       '-'             { MkToken _ TokenSubtract }
       '%'             { MkToken _ TokenModulo}
-      ','             { MkToken _ TokenComma } 
+      ','             { MkToken _ TokenComma }
       catch           { MkToken _ TokenCatch}
       try             { MkToken _ TokenTry}
       throw           { MkToken _ TokenThrow}
@@ -58,12 +58,9 @@ import SyntaxCheck
       '->'            { MkToken _ TokenArrow}
       unit            { MkToken _ TokenUnit}
       return          { MkToken _ TokenReturn}
-<<<<<<< HEAD
-=======
       quote           { MkToken _ TokenQuote}
       fst             { MkToken _ TokenFst}
       snd             { MkToken _ TokenSnd}
->>>>>>> 37e0abb5d995f7adfa6fa51ff7ae47413a94bd36
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}

@@ -147,15 +147,10 @@ data TokenClass =
   TokenIsEmpty                |
   TokenCons                   |
   TokenReturn                 |
-<<<<<<< HEAD
-  TokenTChar
-=======
-  TokenQuote                  |
   TokenTChar                  |
   TokenComma                  |
   TokenFst                    |
   TokenSnd
->>>>>>> 37e0abb5d995f7adfa6fa51ff7ae47413a94bd36
     deriving (Show,Eq)
 
 trimString :: String -> String
