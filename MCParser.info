@@ -34,51 +34,52 @@ Grammar
 	Expression -> throw Exception                      (23)
 	Expression -> lambda '(' Type var ')' '->' Compound_Stmt   (24)
 	Expression -> lambda unit '->' Compound_Stmt       (25)
-	Operation -> Operation '+' Operation               (26)
-	Operation -> Operation '-' Operation               (27)
-	Operation -> Operation '<' Operation               (28)
-	Operation -> Operation '<=' Operation              (29)
-	Operation -> Operation '>' Operation               (30)
-	Operation -> Operation '>=' Operation              (31)
-	Operation -> Operation '*' Operation               (32)
-	Operation -> Operation '%' Operation               (33)
-	Operation -> Operation '/' Operation               (34)
-	Operation -> Operation '==' Operation              (35)
-	Operation -> Operation '!=' Operation              (36)
-	Operation -> Operation '||' Operation              (37)
-	Operation -> Operation '&&' Operation              (38)
-	Operation -> Operation cons Operation              (39)
-	Operation -> '-' Operation                         (40)
-	Operation -> '!' Operation                         (41)
-	Operation -> tail Operation                        (42)
-	Operation -> head Operation                        (43)
-	Operation -> isEmpty Operation                     (44)
-	Operation -> Exp1                                  (45)
-	Exp1 -> Exp1 Exp2                                  (46)
-	Exp1 -> Exp1 unit                                  (47)
-	Exp1 -> Exp2                                       (48)
-	Exp2 -> '(' Expression ')'                         (49)
-	Exp2 -> quote var quote                            (50)
-	Exp2 -> var                                        (51)
-	Exp2 -> bool                                       (52)
-	Exp2 -> number                                     (53)
-	Exp2 -> '(' Expression ',' Expression ')'          (54)
-	Exp2 -> '[' ']'                                    (55)
-	Exception -> NullPointerException                  (56)
-	Exception -> StreamsNotInitialisedException        (57)
-	Exception -> NotExistingStreamConsumptionException   (58)
-	Exception -> DivideByZeroException                 (59)
-	Exception -> TrapException                         (60)
-	Exception -> ListEmptyException                    (61)
-	Type -> boolT                                      (62)
-	Type -> intT                                       (63)
-	Type -> void                                       (64)
-	Type -> char                                       (65)
-	Type -> unit                                       (66)
-	Type -> '[' Type ']'                               (67)
-	Type -> Type '->' Type                             (68)
-	Type -> '(' Type ')'                               (69)
-	Type -> '(' Type ',' Type ')'                      (70)
+	Expression -> include string                       (26)
+	Operation -> Operation '+' Operation               (27)
+	Operation -> Operation '-' Operation               (28)
+	Operation -> Operation '<' Operation               (29)
+	Operation -> Operation '<=' Operation              (30)
+	Operation -> Operation '>' Operation               (31)
+	Operation -> Operation '>=' Operation              (32)
+	Operation -> Operation '*' Operation               (33)
+	Operation -> Operation '%' Operation               (34)
+	Operation -> Operation '/' Operation               (35)
+	Operation -> Operation '==' Operation              (36)
+	Operation -> Operation '!=' Operation              (37)
+	Operation -> Operation '||' Operation              (38)
+	Operation -> Operation '&&' Operation              (39)
+	Operation -> Operation cons Operation              (40)
+	Operation -> '-' Operation                         (41)
+	Operation -> '!' Operation                         (42)
+	Operation -> tail Operation                        (43)
+	Operation -> head Operation                        (44)
+	Operation -> isEmpty Operation                     (45)
+	Operation -> Exp1                                  (46)
+	Exp1 -> Exp1 Exp2                                  (47)
+	Exp1 -> Exp1 unit                                  (48)
+	Exp1 -> Exp2                                       (49)
+	Exp2 -> '(' Expression ')'                         (50)
+	Exp2 -> string                                     (51)
+	Exp2 -> var                                        (52)
+	Exp2 -> bool                                       (53)
+	Exp2 -> number                                     (54)
+	Exp2 -> '(' Expression ',' Expression ')'          (55)
+	Exp2 -> '[' ']'                                    (56)
+	Exception -> NullPointerException                  (57)
+	Exception -> StreamsNotInitialisedException        (58)
+	Exception -> NotExistingStreamConsumptionException   (59)
+	Exception -> DivideByZeroException                 (60)
+	Exception -> TrapException                         (61)
+	Exception -> ListEmptyException                    (62)
+	Type -> boolT                                      (63)
+	Type -> intT                                       (64)
+	Type -> void                                       (65)
+	Type -> char                                       (66)
+	Type -> unit                                       (67)
+	Type -> '[' Type ']'                               (68)
+	Type -> Type '->' Type                             (69)
+	Type -> '(' Type ')'                               (70)
+	Type -> '(' Type ',' Type ')'                      (71)
 
 -----------------------------------------------------------------------------
 Terminals
@@ -114,6 +115,7 @@ Terminals
 	try            { MkToken _ TokenTry }
 	throw          { MkToken _ TokenThrow }
 	number         { MkToken _ (TokenNum $$) }
+	string         { MkToken _ (TokenString $$) }
 	intT           { MkToken _ TokenTInt }
 	char           { MkToken _ TokenTChar }
 	bool           { MkToken _ (TokenBool $$) }
@@ -131,9 +133,9 @@ Terminals
 	'->'           { MkToken _ TokenArrow }
 	unit           { MkToken _ TokenUnit }
 	return         { MkToken _ TokenReturn }
-	quote          { MkToken _ TokenQuote }
 	fst            { MkToken _ TokenFst }
 	snd            { MkToken _ TokenSnd }
+	include        { MkToken _ TokenInclude }
 	NullPointerException{ MkToken _ TokenNPE }
 	StreamsNotInitialisedException{ MkToken _ TokenSNIE }
 	NotExistingStreamConsumptionException{ MkToken _ TokenNESCE }
@@ -149,12 +151,12 @@ Non-terminals
 	Selection_Stmt  rules 7, 8, 9
 	Iteration_Stmt  rule  10
 	Compound_Stmt   rule  11
-	Expression      rules 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25
-	Operation       rules 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45
-	Exp1            rules 46, 47, 48
-	Exp2            rules 49, 50, 51, 52, 53, 54, 55
-	Exception       rules 56, 57, 58, 59, 60, 61
-	Type            rules 62, 63, 64, 65, 66, 67, 68, 69, 70
+	Expression      rules 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
+	Operation       rules 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46
+	Exp1            rules 47, 48, 49
+	Exp2            rules 50, 51, 52, 53, 54, 55, 56
+	Exception       rules 57, 58, 59, 60, 61, 62
+	Type            rules 63, 64, 65, 66, 67, 68, 69, 70, 71
 
 -----------------------------------------------------------------------------
 States
@@ -162,38 +164,39 @@ States
 State 0
 
 
-	if             shift, and enter state 35
-	while          shift, and enter state 36
+	if             shift, and enter state 36
+	while          shift, and enter state 37
 	'['            shift, and enter state 7
 	'('            shift, and enter state 8
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
-	try            shift, and enter state 37
+	try            shift, and enter state 38
 	throw          shift, and enter state 11
 	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
 	fst            shift, and enter state 29
 	snd            shift, and enter state 30
+	include        shift, and enter state 31
 
-	Stmt           goto state 31
-	Selection_Stmt goto state 32
-	Iteration_Stmt goto state 33
-	Expression     goto state 34
+	Stmt           goto state 32
+	Selection_Stmt goto state 33
+	Iteration_Stmt goto state 34
+	Expression     goto state 35
 	Operation      goto state 3
 	Exp1           goto state 4
 	Exp2           goto state 5
@@ -208,24 +211,25 @@ State 1
 	'-'            shift, and enter state 10
 	throw          shift, and enter state 11
 	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
 	fst            shift, and enter state 29
 	snd            shift, and enter state 30
+	include        shift, and enter state 31
 
 	Expression     goto state 2
 	Operation      goto state 3
@@ -237,140 +241,140 @@ State 2
 
 	Stmt -> Expression . ';' Stmt                       (rule 1)
 
-	';'            shift, and enter state 95
+	';'            shift, and enter state 96
 
 
 State 3
 
 	Expression -> Operation .                           (rule 12)
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            shift, and enter state 81
+	'+'            shift, and enter state 82
 	')'            reduce using rule 12
 	';'            reduce using rule 12
-	'<'            shift, and enter state 82
-	'>'            shift, and enter state 83
-	'<='           shift, and enter state 84
-	'>='           shift, and enter state 85
-	'=='           shift, and enter state 86
-	'!='           shift, and enter state 87
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
+	'<'            shift, and enter state 83
+	'>'            shift, and enter state 84
+	'<='           shift, and enter state 85
+	'>='           shift, and enter state 86
+	'=='           shift, and enter state 87
+	'!='           shift, and enter state 88
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
 	','            reduce using rule 12
-	cons           shift, and enter state 94
+	cons           shift, and enter state 95
 
 
 State 4
 
-	Operation -> Exp1 .                                 (rule 45)
-	Exp1 -> Exp1 . Exp2                                 (rule 46)
-	Exp1 -> Exp1 . unit                                 (rule 47)
+	Operation -> Exp1 .                                 (rule 46)
+	Exp1 -> Exp1 . Exp2                                 (rule 47)
+	Exp1 -> Exp1 . unit                                 (rule 48)
 
-	'+'            reduce using rule 45
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
-	')'            reduce using rule 45
-	';'            reduce using rule 45
-	'<'            reduce using rule 45
-	'>'            reduce using rule 45
-	'<='           reduce using rule 45
-	'>='           reduce using rule 45
-	'=='           reduce using rule 45
-	'!='           reduce using rule 45
-	'&&'           reduce using rule 45
-	'||'           reduce using rule 45
-	'/'            reduce using rule 45
-	'*'            reduce using rule 45
-	'-'            reduce using rule 45
-	'%'            reduce using rule 45
-	','            reduce using rule 45
+	'+'            reduce using rule 46
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
+	')'            reduce using rule 46
+	';'            reduce using rule 46
+	'<'            reduce using rule 46
+	'>'            reduce using rule 46
+	'<='           reduce using rule 46
+	'>='           reduce using rule 46
+	'=='           reduce using rule 46
+	'!='           reduce using rule 46
+	'&&'           reduce using rule 46
+	'||'           reduce using rule 46
+	'/'            reduce using rule 46
+	'*'            reduce using rule 46
+	'-'            reduce using rule 46
+	'%'            reduce using rule 46
+	','            reduce using rule 46
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	cons           reduce using rule 45
-	unit           shift, and enter state 80
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	cons           reduce using rule 46
+	unit           shift, and enter state 81
 
-	Exp2           goto state 79
+	Exp2           goto state 80
 
 State 5
 
-	Exp1 -> Exp2 .                                      (rule 48)
+	Exp1 -> Exp2 .                                      (rule 49)
 
-	'+'            reduce using rule 48
-	'['            reduce using rule 48
-	'('            reduce using rule 48
-	')'            reduce using rule 48
-	';'            reduce using rule 48
-	'<'            reduce using rule 48
-	'>'            reduce using rule 48
-	'<='           reduce using rule 48
-	'>='           reduce using rule 48
-	'=='           reduce using rule 48
-	'!='           reduce using rule 48
-	'&&'           reduce using rule 48
-	'||'           reduce using rule 48
-	'/'            reduce using rule 48
-	'*'            reduce using rule 48
-	'-'            reduce using rule 48
-	'%'            reduce using rule 48
-	','            reduce using rule 48
-	number         reduce using rule 48
-	bool           reduce using rule 48
-	var            reduce using rule 48
-	cons           reduce using rule 48
-	unit           reduce using rule 48
-	quote          reduce using rule 48
+	'+'            reduce using rule 49
+	'['            reduce using rule 49
+	'('            reduce using rule 49
+	')'            reduce using rule 49
+	';'            reduce using rule 49
+	'<'            reduce using rule 49
+	'>'            reduce using rule 49
+	'<='           reduce using rule 49
+	'>='           reduce using rule 49
+	'=='           reduce using rule 49
+	'!='           reduce using rule 49
+	'&&'           reduce using rule 49
+	'||'           reduce using rule 49
+	'/'            reduce using rule 49
+	'*'            reduce using rule 49
+	'-'            reduce using rule 49
+	'%'            reduce using rule 49
+	','            reduce using rule 49
+	number         reduce using rule 49
+	string         reduce using rule 49
+	bool           reduce using rule 49
+	var            reduce using rule 49
+	cons           reduce using rule 49
+	unit           reduce using rule 49
 
 
 State 6
 
 	Expression -> Type . var                            (rule 15)
-	Type -> Type . '->' Type                            (rule 68)
+	Type -> Type . '->' Type                            (rule 69)
 
-	var            shift, and enter state 77
-	'->'           shift, and enter state 78
+	var            shift, and enter state 78
+	'->'           shift, and enter state 79
 
 
 State 7
 
-	Exp2 -> '[' . ']'                                   (rule 55)
-	Type -> '[' . Type ']'                              (rule 67)
+	Exp2 -> '[' . ']'                                   (rule 56)
+	Type -> '[' . Type ']'                              (rule 68)
 
-	'['            shift, and enter state 74
-	']'            shift, and enter state 75
-	'('            shift, and enter state 76
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	unit           shift, and enter state 26
+	'['            shift, and enter state 75
+	']'            shift, and enter state 76
+	'('            shift, and enter state 77
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	unit           shift, and enter state 27
 
-	Type           goto state 73
+	Type           goto state 74
 
 State 8
 
-	Exp2 -> '(' . Expression ')'                        (rule 49)
-	Exp2 -> '(' . Expression ',' Expression ')'         (rule 54)
-	Type -> '(' . Type ')'                              (rule 69)
-	Type -> '(' . Type ',' Type ')'                     (rule 70)
+	Exp2 -> '(' . Expression ')'                        (rule 50)
+	Exp2 -> '(' . Expression ',' Expression ')'         (rule 55)
+	Type -> '(' . Type ')'                              (rule 70)
+	Type -> '(' . Type ',' Type ')'                     (rule 71)
 
 	'['            shift, and enter state 7
 	'('            shift, and enter state 8
@@ -378,68 +382,69 @@ State 8
 	'-'            shift, and enter state 10
 	throw          shift, and enter state 11
 	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
 	fst            shift, and enter state 29
 	snd            shift, and enter state 30
+	include        shift, and enter state 31
 
-	Expression     goto state 71
+	Expression     goto state 72
 	Operation      goto state 3
 	Exp1           goto state 4
 	Exp2           goto state 5
-	Type           goto state 72
+	Type           goto state 73
 
 State 9
 
-	Operation -> '!' . Operation                        (rule 41)
+	Operation -> '!' . Operation                        (rule 42)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 70
+	Operation      goto state 71
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 10
 
-	Operation -> '-' . Operation                        (rule 40)
+	Operation -> '-' . Operation                        (rule 41)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 69
+	Operation      goto state 70
 	Exp1           goto state 4
 	Exp2           goto state 5
 
@@ -447,18 +452,100 @@ State 11
 
 	Expression -> throw . Exception                     (rule 23)
 
-	NullPointerExceptionshift, and enter state 63
-	StreamsNotInitialisedExceptionshift, and enter state 64
-	NotExistingStreamConsumptionExceptionshift, and enter state 65
-	DivideByZeroExceptionshift, and enter state 66
-	TrapException  shift, and enter state 67
-	ListEmptyExceptionshift, and enter state 68
+	NullPointerExceptionshift, and enter state 64
+	StreamsNotInitialisedExceptionshift, and enter state 65
+	NotExistingStreamConsumptionExceptionshift, and enter state 66
+	DivideByZeroExceptionshift, and enter state 67
+	TrapException  shift, and enter state 68
+	ListEmptyExceptionshift, and enter state 69
 
-	Exception      goto state 62
+	Exception      goto state 63
 
 State 12
 
-	Exp2 -> number .                                    (rule 53)
+	Exp2 -> number .                                    (rule 54)
+
+	'+'            reduce using rule 54
+	'['            reduce using rule 54
+	'('            reduce using rule 54
+	')'            reduce using rule 54
+	';'            reduce using rule 54
+	'<'            reduce using rule 54
+	'>'            reduce using rule 54
+	'<='           reduce using rule 54
+	'>='           reduce using rule 54
+	'=='           reduce using rule 54
+	'!='           reduce using rule 54
+	'&&'           reduce using rule 54
+	'||'           reduce using rule 54
+	'/'            reduce using rule 54
+	'*'            reduce using rule 54
+	'-'            reduce using rule 54
+	'%'            reduce using rule 54
+	','            reduce using rule 54
+	number         reduce using rule 54
+	string         reduce using rule 54
+	bool           reduce using rule 54
+	var            reduce using rule 54
+	cons           reduce using rule 54
+	unit           reduce using rule 54
+
+
+State 13
+
+	Exp2 -> string .                                    (rule 51)
+
+	'+'            reduce using rule 51
+	'['            reduce using rule 51
+	'('            reduce using rule 51
+	')'            reduce using rule 51
+	';'            reduce using rule 51
+	'<'            reduce using rule 51
+	'>'            reduce using rule 51
+	'<='           reduce using rule 51
+	'>='           reduce using rule 51
+	'=='           reduce using rule 51
+	'!='           reduce using rule 51
+	'&&'           reduce using rule 51
+	'||'           reduce using rule 51
+	'/'            reduce using rule 51
+	'*'            reduce using rule 51
+	'-'            reduce using rule 51
+	'%'            reduce using rule 51
+	','            reduce using rule 51
+	number         reduce using rule 51
+	string         reduce using rule 51
+	bool           reduce using rule 51
+	var            reduce using rule 51
+	cons           reduce using rule 51
+	unit           reduce using rule 51
+
+
+State 14
+
+	Type -> intT .                                      (rule 64)
+
+	']'            reduce using rule 64
+	')'            reduce using rule 64
+	','            reduce using rule 64
+	var            reduce using rule 64
+	'->'           reduce using rule 64
+
+
+State 15
+
+	Type -> char .                                      (rule 66)
+
+	']'            reduce using rule 66
+	')'            reduce using rule 66
+	','            reduce using rule 66
+	var            reduce using rule 66
+	'->'           reduce using rule 66
+
+
+State 16
+
+	Exp2 -> bool .                                      (rule 53)
 
 	'+'            reduce using rule 53
 	'['            reduce using rule 53
@@ -479,16 +566,16 @@ State 12
 	'%'            reduce using rule 53
 	','            reduce using rule 53
 	number         reduce using rule 53
+	string         reduce using rule 53
 	bool           reduce using rule 53
 	var            reduce using rule 53
 	cons           reduce using rule 53
 	unit           reduce using rule 53
-	quote          reduce using rule 53
 
 
-State 13
+State 17
 
-	Type -> intT .                                      (rule 63)
+	Type -> boolT .                                     (rule 63)
 
 	']'            reduce using rule 63
 	')'            reduce using rule 63
@@ -497,9 +584,9 @@ State 13
 	'->'           reduce using rule 63
 
 
-State 14
+State 18
 
-	Type -> char .                                      (rule 65)
+	Type -> void .                                      (rule 65)
 
 	']'            reduce using rule 65
 	')'            reduce using rule 65
@@ -508,9 +595,825 @@ State 14
 	'->'           reduce using rule 65
 
 
-State 15
+State 19
 
-	Exp2 -> bool .                                      (rule 52)
+	Expression -> var . '=' Expression                  (rule 13)
+	Expression -> var . '=' unit                        (rule 14)
+	Exp2 -> var .                                       (rule 52)
+
+	'='            shift, and enter state 62
+	'+'            reduce using rule 52
+	'['            reduce using rule 52
+	'('            reduce using rule 52
+	')'            reduce using rule 52
+	';'            reduce using rule 52
+	'<'            reduce using rule 52
+	'>'            reduce using rule 52
+	'<='           reduce using rule 52
+	'>='           reduce using rule 52
+	'=='           reduce using rule 52
+	'!='           reduce using rule 52
+	'&&'           reduce using rule 52
+	'||'           reduce using rule 52
+	'/'            reduce using rule 52
+	'*'            reduce using rule 52
+	'-'            reduce using rule 52
+	'%'            reduce using rule 52
+	','            reduce using rule 52
+	number         reduce using rule 52
+	string         reduce using rule 52
+	bool           reduce using rule 52
+	var            reduce using rule 52
+	cons           reduce using rule 52
+	unit           reduce using rule 52
+
+
+State 20
+
+	Expression -> print . Expression                    (rule 16)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 61
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 21
+
+	Operation -> head . Operation                       (rule 44)
+
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+
+	Operation      goto state 60
+	Exp1           goto state 4
+	Exp2           goto state 5
+
+State 22
+
+	Operation -> tail . Operation                       (rule 43)
+
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+
+	Operation      goto state 59
+	Exp1           goto state 4
+	Exp2           goto state 5
+
+State 23
+
+	Operation -> isEmpty . Operation                    (rule 45)
+
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+
+	Operation      goto state 55
+	Exp1           goto state 4
+	Exp2           goto state 5
+
+State 24
+
+	Expression -> consume . Expression                  (rule 17)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 54
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 25
+
+	Expression -> streams . Expression                  (rule 18)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 53
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 26
+
+	Expression -> lambda . '(' Type var ')' '->' Compound_Stmt    (rule 24)
+	Expression -> lambda . unit '->' Compound_Stmt      (rule 25)
+
+	'('            shift, and enter state 51
+	unit           shift, and enter state 52
+
+
+State 27
+
+	Type -> unit .                                      (rule 67)
+
+	']'            reduce using rule 67
+	')'            reduce using rule 67
+	','            reduce using rule 67
+	var            reduce using rule 67
+	'->'           reduce using rule 67
+
+
+State 28
+
+	Expression -> return . Expression                   (rule 21)
+	Expression -> return . unit                         (rule 22)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 50
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 49
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 29
+
+	Expression -> fst . Expression                      (rule 19)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 48
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 30
+
+	Expression -> snd . Expression                      (rule 20)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 47
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 31
+
+	Expression -> include . string                      (rule 26)
+
+	string         shift, and enter state 46
+
+
+State 32
+
+	%start_parse -> Stmt .                              (rule 0)
+
+	%eof           accept
+
+
+State 33
+
+	Stmt -> Selection_Stmt . Stmt                       (rule 3)
+	Stmt -> Selection_Stmt .                            (rule 5)
+
+	if             shift, and enter state 36
+	while          shift, and enter state 37
+	'}'            reduce using rule 5
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	try            shift, and enter state 38
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+	%eof           reduce using rule 5
+
+	Stmt           goto state 45
+	Selection_Stmt goto state 33
+	Iteration_Stmt goto state 34
+	Expression     goto state 35
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 34
+
+	Stmt -> Iteration_Stmt . Stmt                       (rule 4)
+	Stmt -> Iteration_Stmt .                            (rule 6)
+
+	if             shift, and enter state 36
+	while          shift, and enter state 37
+	'}'            reduce using rule 6
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	try            shift, and enter state 38
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+	%eof           reduce using rule 6
+
+	Stmt           goto state 44
+	Selection_Stmt goto state 33
+	Iteration_Stmt goto state 34
+	Expression     goto state 35
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 35
+
+	Stmt -> Expression . ';' Stmt                       (rule 1)
+	Stmt -> Expression . ';'                            (rule 2)
+
+	';'            shift, and enter state 43
+
+
+State 36
+
+	Selection_Stmt -> if . '(' Expression ')' Compound_Stmt else Compound_Stmt    (rule 7)
+	Selection_Stmt -> if . '(' Expression ')' Compound_Stmt    (rule 8)
+
+	'('            shift, and enter state 42
+
+
+State 37
+
+	Iteration_Stmt -> while . '(' Expression ')' Compound_Stmt    (rule 10)
+
+	'('            shift, and enter state 41
+
+
+State 38
+
+	Selection_Stmt -> try . Compound_Stmt catch '(' Exception ')' Compound_Stmt    (rule 9)
+
+	'{'            shift, and enter state 40
+
+	Compound_Stmt  goto state 39
+
+State 39
+
+	Selection_Stmt -> try Compound_Stmt . catch '(' Exception ')' Compound_Stmt    (rule 9)
+
+	catch          shift, and enter state 126
+
+
+State 40
+
+	Compound_Stmt -> '{' . Stmt '}'                     (rule 11)
+
+	if             shift, and enter state 36
+	while          shift, and enter state 37
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	try            shift, and enter state 38
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Stmt           goto state 125
+	Selection_Stmt goto state 33
+	Iteration_Stmt goto state 34
+	Expression     goto state 35
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 41
+
+	Iteration_Stmt -> while '(' . Expression ')' Compound_Stmt    (rule 10)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 124
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 42
+
+	Selection_Stmt -> if '(' . Expression ')' Compound_Stmt else Compound_Stmt    (rule 7)
+	Selection_Stmt -> if '(' . Expression ')' Compound_Stmt    (rule 8)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 123
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 43
+
+	Stmt -> Expression ';' . Stmt                       (rule 1)
+	Stmt -> Expression ';' .                            (rule 2)
+
+	if             shift, and enter state 36
+	while          shift, and enter state 37
+	'}'            reduce using rule 2
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	try            shift, and enter state 38
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+	%eof           reduce using rule 2
+
+	Stmt           goto state 97
+	Selection_Stmt goto state 33
+	Iteration_Stmt goto state 34
+	Expression     goto state 35
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 44
+
+	Stmt -> Iteration_Stmt Stmt .                       (rule 4)
+
+	'}'            reduce using rule 4
+	%eof           reduce using rule 4
+
+
+State 45
+
+	Stmt -> Selection_Stmt Stmt .                       (rule 3)
+
+	'}'            reduce using rule 3
+	%eof           reduce using rule 3
+
+
+State 46
+
+	Expression -> include string .                      (rule 26)
+
+	')'            reduce using rule 26
+	';'            reduce using rule 26
+	','            reduce using rule 26
+
+
+State 47
+
+	Expression -> snd Expression .                      (rule 20)
+
+	')'            reduce using rule 20
+	';'            reduce using rule 20
+	','            reduce using rule 20
+
+
+State 48
+
+	Expression -> fst Expression .                      (rule 19)
+
+	')'            reduce using rule 19
+	';'            reduce using rule 19
+	','            reduce using rule 19
+
+
+State 49
+
+	Expression -> return Expression .                   (rule 21)
+
+	')'            reduce using rule 21
+	';'            reduce using rule 21
+	','            reduce using rule 21
+
+
+State 50
+
+	Expression -> return unit .                         (rule 22)
+	Type -> unit .                                      (rule 67)
+
+	')'            reduce using rule 22
+	';'            reduce using rule 22
+	','            reduce using rule 22
+	var            reduce using rule 67
+	'->'           reduce using rule 67
+
+
+State 51
+
+	Expression -> lambda '(' . Type var ')' '->' Compound_Stmt    (rule 24)
+
+	'['            shift, and enter state 75
+	'('            shift, and enter state 77
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	unit           shift, and enter state 27
+
+	Type           goto state 122
+
+State 52
+
+	Expression -> lambda unit . '->' Compound_Stmt      (rule 25)
+
+	'->'           shift, and enter state 121
+
+
+State 53
+
+	Expression -> streams Expression .                  (rule 18)
+
+	')'            reduce using rule 18
+	';'            reduce using rule 18
+	','            reduce using rule 18
+
+
+State 54
+
+	Expression -> consume Expression .                  (rule 17)
+
+	')'            reduce using rule 17
+	';'            reduce using rule 17
+	','            reduce using rule 17
+
+
+State 55
+
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+	Operation -> isEmpty Operation .                    (rule 45)
+
+	'+'            reduce using rule 45
+	')'            reduce using rule 45
+	';'            reduce using rule 45
+	'<'            reduce using rule 45
+	'>'            reduce using rule 45
+	'<='           reduce using rule 45
+	'>='           reduce using rule 45
+	'=='           reduce using rule 45
+	'!='           reduce using rule 45
+	'&&'           reduce using rule 45
+	'||'           reduce using rule 45
+	'/'            reduce using rule 45
+	'*'            reduce using rule 45
+	'-'            reduce using rule 45
+	'%'            reduce using rule 45
+	','            reduce using rule 45
+	cons           reduce using rule 45
+
+
+State 56
+
+	Exp2 -> '[' . ']'                                   (rule 56)
+
+	']'            shift, and enter state 76
+
+
+State 57
+
+	Exp2 -> '(' . Expression ')'                        (rule 50)
+	Exp2 -> '(' . Expression ',' Expression ')'         (rule 55)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 72
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 58
+
+	Exp2 -> var .                                       (rule 52)
 
 	'+'            reduce using rule 52
 	'['            reduce using rule 52
@@ -531,920 +1434,30 @@ State 15
 	'%'            reduce using rule 52
 	','            reduce using rule 52
 	number         reduce using rule 52
+	string         reduce using rule 52
 	bool           reduce using rule 52
 	var            reduce using rule 52
 	cons           reduce using rule 52
 	unit           reduce using rule 52
-	quote          reduce using rule 52
-
-
-State 16
-
-	Type -> boolT .                                     (rule 62)
-
-	']'            reduce using rule 62
-	')'            reduce using rule 62
-	','            reduce using rule 62
-	var            reduce using rule 62
-	'->'           reduce using rule 62
-
-
-State 17
-
-	Type -> void .                                      (rule 64)
-
-	']'            reduce using rule 64
-	')'            reduce using rule 64
-	','            reduce using rule 64
-	var            reduce using rule 64
-	'->'           reduce using rule 64
-
-
-State 18
-
-	Expression -> var . '=' Expression                  (rule 13)
-	Expression -> var . '=' unit                        (rule 14)
-	Exp2 -> var .                                       (rule 51)
-
-	'='            shift, and enter state 61
-	'+'            reduce using rule 51
-	'['            reduce using rule 51
-	'('            reduce using rule 51
-	')'            reduce using rule 51
-	';'            reduce using rule 51
-	'<'            reduce using rule 51
-	'>'            reduce using rule 51
-	'<='           reduce using rule 51
-	'>='           reduce using rule 51
-	'=='           reduce using rule 51
-	'!='           reduce using rule 51
-	'&&'           reduce using rule 51
-	'||'           reduce using rule 51
-	'/'            reduce using rule 51
-	'*'            reduce using rule 51
-	'-'            reduce using rule 51
-	'%'            reduce using rule 51
-	','            reduce using rule 51
-	number         reduce using rule 51
-	bool           reduce using rule 51
-	var            reduce using rule 51
-	cons           reduce using rule 51
-	unit           reduce using rule 51
-	quote          reduce using rule 51
-
-
-State 19
-
-	Expression -> print . Expression                    (rule 16)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 60
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 20
-
-	Operation -> head . Operation                       (rule 43)
-
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
-
-	Operation      goto state 59
-	Exp1           goto state 4
-	Exp2           goto state 5
-
-State 21
-
-	Operation -> tail . Operation                       (rule 42)
-
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
-
-	Operation      goto state 58
-	Exp1           goto state 4
-	Exp2           goto state 5
-
-State 22
-
-	Operation -> isEmpty . Operation                    (rule 44)
-
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
-
-	Operation      goto state 54
-	Exp1           goto state 4
-	Exp2           goto state 5
-
-State 23
-
-	Expression -> consume . Expression                  (rule 17)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 53
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 24
-
-	Expression -> streams . Expression                  (rule 18)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 52
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 25
-
-	Expression -> lambda . '(' Type var ')' '->' Compound_Stmt    (rule 24)
-	Expression -> lambda . unit '->' Compound_Stmt      (rule 25)
-
-	'('            shift, and enter state 50
-	unit           shift, and enter state 51
-
-
-State 26
-
-	Type -> unit .                                      (rule 66)
-
-	']'            reduce using rule 66
-	')'            reduce using rule 66
-	','            reduce using rule 66
-	var            reduce using rule 66
-	'->'           reduce using rule 66
-
-
-State 27
-
-	Expression -> return . Expression                   (rule 21)
-	Expression -> return . unit                         (rule 22)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 49
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 48
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 28
-
-	Exp2 -> quote . var quote                           (rule 50)
-
-	var            shift, and enter state 47
-
-
-State 29
-
-	Expression -> fst . Expression                      (rule 19)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 46
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 30
-
-	Expression -> snd . Expression                      (rule 20)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 45
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 31
-
-	%start_parse -> Stmt .                              (rule 0)
-
-	%eof           accept
-
-
-State 32
-
-	Stmt -> Selection_Stmt . Stmt                       (rule 3)
-	Stmt -> Selection_Stmt .                            (rule 5)
-
-	if             shift, and enter state 35
-	while          shift, and enter state 36
-	'}'            reduce using rule 5
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	try            shift, and enter state 37
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-	%eof           reduce using rule 5
-
-	Stmt           goto state 44
-	Selection_Stmt goto state 32
-	Iteration_Stmt goto state 33
-	Expression     goto state 34
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 33
-
-	Stmt -> Iteration_Stmt . Stmt                       (rule 4)
-	Stmt -> Iteration_Stmt .                            (rule 6)
-
-	if             shift, and enter state 35
-	while          shift, and enter state 36
-	'}'            reduce using rule 6
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	try            shift, and enter state 37
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-	%eof           reduce using rule 6
-
-	Stmt           goto state 43
-	Selection_Stmt goto state 32
-	Iteration_Stmt goto state 33
-	Expression     goto state 34
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 34
-
-	Stmt -> Expression . ';' Stmt                       (rule 1)
-	Stmt -> Expression . ';'                            (rule 2)
-
-	';'            shift, and enter state 42
-
-
-State 35
-
-	Selection_Stmt -> if . '(' Expression ')' Compound_Stmt else Compound_Stmt    (rule 7)
-	Selection_Stmt -> if . '(' Expression ')' Compound_Stmt    (rule 8)
-
-	'('            shift, and enter state 41
-
-
-State 36
-
-	Iteration_Stmt -> while . '(' Expression ')' Compound_Stmt    (rule 10)
-
-	'('            shift, and enter state 40
-
-
-State 37
-
-	Selection_Stmt -> try . Compound_Stmt catch '(' Exception ')' Compound_Stmt    (rule 9)
-
-	'{'            shift, and enter state 39
-
-	Compound_Stmt  goto state 38
-
-State 38
-
-	Selection_Stmt -> try Compound_Stmt . catch '(' Exception ')' Compound_Stmt    (rule 9)
-
-	catch          shift, and enter state 126
-
-
-State 39
-
-	Compound_Stmt -> '{' . Stmt '}'                     (rule 11)
-
-	if             shift, and enter state 35
-	while          shift, and enter state 36
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	try            shift, and enter state 37
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Stmt           goto state 125
-	Selection_Stmt goto state 32
-	Iteration_Stmt goto state 33
-	Expression     goto state 34
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 40
-
-	Iteration_Stmt -> while '(' . Expression ')' Compound_Stmt    (rule 10)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 124
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 41
-
-	Selection_Stmt -> if '(' . Expression ')' Compound_Stmt else Compound_Stmt    (rule 7)
-	Selection_Stmt -> if '(' . Expression ')' Compound_Stmt    (rule 8)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 123
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 42
-
-	Stmt -> Expression ';' . Stmt                       (rule 1)
-	Stmt -> Expression ';' .                            (rule 2)
-
-	if             shift, and enter state 35
-	while          shift, and enter state 36
-	'}'            reduce using rule 2
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	try            shift, and enter state 37
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-	%eof           reduce using rule 2
-
-	Stmt           goto state 96
-	Selection_Stmt goto state 32
-	Iteration_Stmt goto state 33
-	Expression     goto state 34
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 43
-
-	Stmt -> Iteration_Stmt Stmt .                       (rule 4)
-
-	'}'            reduce using rule 4
-	%eof           reduce using rule 4
-
-
-State 44
-
-	Stmt -> Selection_Stmt Stmt .                       (rule 3)
-
-	'}'            reduce using rule 3
-	%eof           reduce using rule 3
-
-
-State 45
-
-	Expression -> snd Expression .                      (rule 20)
-
-	')'            reduce using rule 20
-	';'            reduce using rule 20
-	','            reduce using rule 20
-
-
-State 46
-
-	Expression -> fst Expression .                      (rule 19)
-
-	')'            reduce using rule 19
-	';'            reduce using rule 19
-	','            reduce using rule 19
-
-
-State 47
-
-	Exp2 -> quote var . quote                           (rule 50)
-
-	quote          shift, and enter state 122
-
-
-State 48
-
-	Expression -> return Expression .                   (rule 21)
-
-	')'            reduce using rule 21
-	';'            reduce using rule 21
-	','            reduce using rule 21
-
-
-State 49
-
-	Expression -> return unit .                         (rule 22)
-	Type -> unit .                                      (rule 66)
-
-	')'            reduce using rule 22
-	';'            reduce using rule 22
-	','            reduce using rule 22
-	var            reduce using rule 66
-	'->'           reduce using rule 66
-
-
-State 50
-
-	Expression -> lambda '(' . Type var ')' '->' Compound_Stmt    (rule 24)
-
-	'['            shift, and enter state 74
-	'('            shift, and enter state 76
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	unit           shift, and enter state 26
-
-	Type           goto state 121
-
-State 51
-
-	Expression -> lambda unit . '->' Compound_Stmt      (rule 25)
-
-	'->'           shift, and enter state 120
-
-
-State 52
-
-	Expression -> streams Expression .                  (rule 18)
-
-	')'            reduce using rule 18
-	';'            reduce using rule 18
-	','            reduce using rule 18
-
-
-State 53
-
-	Expression -> consume Expression .                  (rule 17)
-
-	')'            reduce using rule 17
-	';'            reduce using rule 17
-	','            reduce using rule 17
-
-
-State 54
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-	Operation -> isEmpty Operation .                    (rule 44)
-
-	'+'            reduce using rule 44
-	')'            reduce using rule 44
-	';'            reduce using rule 44
-	'<'            reduce using rule 44
-	'>'            reduce using rule 44
-	'<='           reduce using rule 44
-	'>='           reduce using rule 44
-	'=='           reduce using rule 44
-	'!='           reduce using rule 44
-	'&&'           reduce using rule 44
-	'||'           reduce using rule 44
-	'/'            reduce using rule 44
-	'*'            reduce using rule 44
-	'-'            reduce using rule 44
-	'%'            reduce using rule 44
-	','            reduce using rule 44
-	cons           reduce using rule 44
-
-
-State 55
-
-	Exp2 -> '[' . ']'                                   (rule 55)
-
-	']'            shift, and enter state 75
-
-
-State 56
-
-	Exp2 -> '(' . Expression ')'                        (rule 49)
-	Exp2 -> '(' . Expression ',' Expression ')'         (rule 54)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 71
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 57
-
-	Exp2 -> var .                                       (rule 51)
-
-	'+'            reduce using rule 51
-	'['            reduce using rule 51
-	'('            reduce using rule 51
-	')'            reduce using rule 51
-	';'            reduce using rule 51
-	'<'            reduce using rule 51
-	'>'            reduce using rule 51
-	'<='           reduce using rule 51
-	'>='           reduce using rule 51
-	'=='           reduce using rule 51
-	'!='           reduce using rule 51
-	'&&'           reduce using rule 51
-	'||'           reduce using rule 51
-	'/'            reduce using rule 51
-	'*'            reduce using rule 51
-	'-'            reduce using rule 51
-	'%'            reduce using rule 51
-	','            reduce using rule 51
-	number         reduce using rule 51
-	bool           reduce using rule 51
-	var            reduce using rule 51
-	cons           reduce using rule 51
-	unit           reduce using rule 51
-	quote          reduce using rule 51
-
-
-State 58
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-	Operation -> tail Operation .                       (rule 42)
-
-	'+'            reduce using rule 42
-	')'            reduce using rule 42
-	';'            reduce using rule 42
-	'<'            reduce using rule 42
-	'>'            reduce using rule 42
-	'<='           reduce using rule 42
-	'>='           reduce using rule 42
-	'=='           reduce using rule 42
-	'!='           reduce using rule 42
-	'&&'           reduce using rule 42
-	'||'           reduce using rule 42
-	'/'            reduce using rule 42
-	'*'            reduce using rule 42
-	'-'            reduce using rule 42
-	'%'            reduce using rule 42
-	','            reduce using rule 42
-	cons           reduce using rule 42
 
 
 State 59
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-	Operation -> head Operation .                       (rule 43)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+	Operation -> tail Operation .                       (rule 43)
 
 	'+'            reduce using rule 43
 	')'            reduce using rule 43
@@ -1467,6 +1480,43 @@ State 59
 
 State 60
 
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+	Operation -> head Operation .                       (rule 44)
+
+	'+'            reduce using rule 44
+	')'            reduce using rule 44
+	';'            reduce using rule 44
+	'<'            reduce using rule 44
+	'>'            reduce using rule 44
+	'<='           reduce using rule 44
+	'>='           reduce using rule 44
+	'=='           reduce using rule 44
+	'!='           reduce using rule 44
+	'&&'           reduce using rule 44
+	'||'           reduce using rule 44
+	'/'            reduce using rule 44
+	'*'            reduce using rule 44
+	'-'            reduce using rule 44
+	'%'            reduce using rule 44
+	','            reduce using rule 44
+	cons           reduce using rule 44
+
+
+State 61
+
 	Expression -> print Expression .                    (rule 16)
 
 	')'            reduce using rule 16
@@ -1474,7 +1524,7 @@ State 60
 	','            reduce using rule 16
 
 
-State 61
+State 62
 
 	Expression -> var '=' . Expression                  (rule 13)
 	Expression -> var '=' . unit                        (rule 14)
@@ -1485,32 +1535,33 @@ State 61
 	'-'            shift, and enter state 10
 	throw          shift, and enter state 11
 	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 119
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 120
+	return         shift, and enter state 28
 	fst            shift, and enter state 29
 	snd            shift, and enter state 30
+	include        shift, and enter state 31
 
-	Expression     goto state 118
+	Expression     goto state 119
 	Operation      goto state 3
 	Exp1           goto state 4
 	Exp2           goto state 5
 	Type           goto state 6
 
-State 62
+State 63
 
 	Expression -> throw Exception .                     (rule 23)
 
@@ -1519,18 +1570,9 @@ State 62
 	','            reduce using rule 23
 
 
-State 63
-
-	Exception -> NullPointerException .                 (rule 56)
-
-	')'            reduce using rule 56
-	';'            reduce using rule 56
-	','            reduce using rule 56
-
-
 State 64
 
-	Exception -> StreamsNotInitialisedException .       (rule 57)
+	Exception -> NullPointerException .                 (rule 57)
 
 	')'            reduce using rule 57
 	';'            reduce using rule 57
@@ -1539,7 +1581,7 @@ State 64
 
 State 65
 
-	Exception -> NotExistingStreamConsumptionException .    (rule 58)
+	Exception -> StreamsNotInitialisedException .       (rule 58)
 
 	')'            reduce using rule 58
 	';'            reduce using rule 58
@@ -1548,7 +1590,7 @@ State 65
 
 State 66
 
-	Exception -> DivideByZeroException .                (rule 59)
+	Exception -> NotExistingStreamConsumptionException .    (rule 59)
 
 	')'            reduce using rule 59
 	';'            reduce using rule 59
@@ -1557,7 +1599,7 @@ State 66
 
 State 67
 
-	Exception -> TrapException .                        (rule 60)
+	Exception -> DivideByZeroException .                (rule 60)
 
 	')'            reduce using rule 60
 	';'            reduce using rule 60
@@ -1566,7 +1608,7 @@ State 67
 
 State 68
 
-	Exception -> ListEmptyException .                   (rule 61)
+	Exception -> TrapException .                        (rule 61)
 
 	')'            reduce using rule 61
 	';'            reduce using rule 61
@@ -1575,58 +1617,30 @@ State 68
 
 State 69
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-	Operation -> '-' Operation .                        (rule 40)
+	Exception -> ListEmptyException .                   (rule 62)
 
-	'+'            reduce using rule 40
-	')'            reduce using rule 40
-	';'            reduce using rule 40
-	'<'            reduce using rule 40
-	'>'            reduce using rule 40
-	'<='           reduce using rule 40
-	'>='           reduce using rule 40
-	'=='           reduce using rule 40
-	'!='           reduce using rule 40
-	'&&'           reduce using rule 40
-	'||'           reduce using rule 40
-	'/'            reduce using rule 40
-	'*'            reduce using rule 40
-	'-'            reduce using rule 40
-	'%'            reduce using rule 40
-	','            reduce using rule 40
-	cons           reduce using rule 40
+	')'            reduce using rule 62
+	';'            reduce using rule 62
+	','            reduce using rule 62
 
 
 State 70
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-	Operation -> '!' Operation .                        (rule 41)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+	Operation -> '-' Operation .                        (rule 41)
 
 	'+'            reduce using rule 41
 	')'            reduce using rule 41
@@ -1649,95 +1663,132 @@ State 70
 
 State 71
 
-	Exp2 -> '(' Expression . ')'                        (rule 49)
-	Exp2 -> '(' Expression . ',' Expression ')'         (rule 54)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+	Operation -> '!' Operation .                        (rule 42)
 
-	')'            shift, and enter state 116
-	','            shift, and enter state 117
+	'+'            reduce using rule 42
+	')'            reduce using rule 42
+	';'            reduce using rule 42
+	'<'            reduce using rule 42
+	'>'            reduce using rule 42
+	'<='           reduce using rule 42
+	'>='           reduce using rule 42
+	'=='           reduce using rule 42
+	'!='           reduce using rule 42
+	'&&'           reduce using rule 42
+	'||'           reduce using rule 42
+	'/'            reduce using rule 42
+	'*'            reduce using rule 42
+	'-'            reduce using rule 42
+	'%'            reduce using rule 42
+	','            reduce using rule 42
+	cons           reduce using rule 42
 
 
 State 72
 
-	Expression -> Type . var                            (rule 15)
-	Type -> Type . '->' Type                            (rule 68)
-	Type -> '(' Type . ')'                              (rule 69)
-	Type -> '(' Type . ',' Type ')'                     (rule 70)
+	Exp2 -> '(' Expression . ')'                        (rule 50)
+	Exp2 -> '(' Expression . ',' Expression ')'         (rule 55)
 
-	')'            shift, and enter state 114
-	','            shift, and enter state 115
-	var            shift, and enter state 77
-	'->'           shift, and enter state 78
+	')'            shift, and enter state 117
+	','            shift, and enter state 118
 
 
 State 73
 
-	Type -> '[' Type . ']'                              (rule 67)
-	Type -> Type . '->' Type                            (rule 68)
+	Expression -> Type . var                            (rule 15)
+	Type -> Type . '->' Type                            (rule 69)
+	Type -> '(' Type . ')'                              (rule 70)
+	Type -> '(' Type . ',' Type ')'                     (rule 71)
 
-	']'            shift, and enter state 113
-	'->'           shift, and enter state 78
+	')'            shift, and enter state 115
+	','            shift, and enter state 116
+	var            shift, and enter state 78
+	'->'           shift, and enter state 79
 
 
 State 74
 
-	Type -> '[' . Type ']'                              (rule 67)
+	Type -> '[' Type . ']'                              (rule 68)
+	Type -> Type . '->' Type                            (rule 69)
 
-	'['            shift, and enter state 74
-	'('            shift, and enter state 76
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	unit           shift, and enter state 26
+	']'            shift, and enter state 114
+	'->'           shift, and enter state 79
 
-	Type           goto state 73
 
 State 75
 
-	Exp2 -> '[' ']' .                                   (rule 55)
+	Type -> '[' . Type ']'                              (rule 68)
 
-	'+'            reduce using rule 55
-	'['            reduce using rule 55
-	'('            reduce using rule 55
-	')'            reduce using rule 55
-	';'            reduce using rule 55
-	'<'            reduce using rule 55
-	'>'            reduce using rule 55
-	'<='           reduce using rule 55
-	'>='           reduce using rule 55
-	'=='           reduce using rule 55
-	'!='           reduce using rule 55
-	'&&'           reduce using rule 55
-	'||'           reduce using rule 55
-	'/'            reduce using rule 55
-	'*'            reduce using rule 55
-	'-'            reduce using rule 55
-	'%'            reduce using rule 55
-	','            reduce using rule 55
-	number         reduce using rule 55
-	bool           reduce using rule 55
-	var            reduce using rule 55
-	cons           reduce using rule 55
-	unit           reduce using rule 55
-	quote          reduce using rule 55
+	'['            shift, and enter state 75
+	'('            shift, and enter state 77
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	unit           shift, and enter state 27
 
+	Type           goto state 74
 
 State 76
 
-	Type -> '(' . Type ')'                              (rule 69)
-	Type -> '(' . Type ',' Type ')'                     (rule 70)
+	Exp2 -> '[' ']' .                                   (rule 56)
 
-	'['            shift, and enter state 74
-	'('            shift, and enter state 76
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	unit           shift, and enter state 26
+	'+'            reduce using rule 56
+	'['            reduce using rule 56
+	'('            reduce using rule 56
+	')'            reduce using rule 56
+	';'            reduce using rule 56
+	'<'            reduce using rule 56
+	'>'            reduce using rule 56
+	'<='           reduce using rule 56
+	'>='           reduce using rule 56
+	'=='           reduce using rule 56
+	'!='           reduce using rule 56
+	'&&'           reduce using rule 56
+	'||'           reduce using rule 56
+	'/'            reduce using rule 56
+	'*'            reduce using rule 56
+	'-'            reduce using rule 56
+	'%'            reduce using rule 56
+	','            reduce using rule 56
+	number         reduce using rule 56
+	string         reduce using rule 56
+	bool           reduce using rule 56
+	var            reduce using rule 56
+	cons           reduce using rule 56
+	unit           reduce using rule 56
 
-	Type           goto state 112
 
 State 77
+
+	Type -> '(' . Type ')'                              (rule 70)
+	Type -> '(' . Type ',' Type ')'                     (rule 71)
+
+	'['            shift, and enter state 75
+	'('            shift, and enter state 77
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	unit           shift, and enter state 27
+
+	Type           goto state 113
+
+State 78
 
 	Expression -> Type var .                            (rule 15)
 
@@ -1746,53 +1797,23 @@ State 77
 	','            reduce using rule 15
 
 
-State 78
-
-	Type -> Type '->' . Type                            (rule 68)
-
-	'['            shift, and enter state 74
-	'('            shift, and enter state 76
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	unit           shift, and enter state 26
-
-	Type           goto state 111
-
 State 79
 
-	Exp1 -> Exp1 Exp2 .                                 (rule 46)
+	Type -> Type '->' . Type                            (rule 69)
 
-	'+'            reduce using rule 46
-	'['            reduce using rule 46
-	'('            reduce using rule 46
-	')'            reduce using rule 46
-	';'            reduce using rule 46
-	'<'            reduce using rule 46
-	'>'            reduce using rule 46
-	'<='           reduce using rule 46
-	'>='           reduce using rule 46
-	'=='           reduce using rule 46
-	'!='           reduce using rule 46
-	'&&'           reduce using rule 46
-	'||'           reduce using rule 46
-	'/'            reduce using rule 46
-	'*'            reduce using rule 46
-	'-'            reduce using rule 46
-	'%'            reduce using rule 46
-	','            reduce using rule 46
-	number         reduce using rule 46
-	bool           reduce using rule 46
-	var            reduce using rule 46
-	cons           reduce using rule 46
-	unit           reduce using rule 46
-	quote          reduce using rule 46
+	'['            shift, and enter state 75
+	'('            shift, and enter state 77
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	unit           shift, and enter state 27
 
+	Type           goto state 112
 
 State 80
 
-	Exp1 -> Exp1 unit .                                 (rule 47)
+	Exp1 -> Exp1 Exp2 .                                 (rule 47)
 
 	'+'            reduce using rule 47
 	'['            reduce using rule 47
@@ -1813,335 +1834,366 @@ State 80
 	'%'            reduce using rule 47
 	','            reduce using rule 47
 	number         reduce using rule 47
+	string         reduce using rule 47
 	bool           reduce using rule 47
 	var            reduce using rule 47
 	cons           reduce using rule 47
 	unit           reduce using rule 47
-	quote          reduce using rule 47
 
 
 State 81
 
-	Operation -> Operation '+' . Operation              (rule 26)
+	Exp1 -> Exp1 unit .                                 (rule 48)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	'+'            reduce using rule 48
+	'['            reduce using rule 48
+	'('            reduce using rule 48
+	')'            reduce using rule 48
+	';'            reduce using rule 48
+	'<'            reduce using rule 48
+	'>'            reduce using rule 48
+	'<='           reduce using rule 48
+	'>='           reduce using rule 48
+	'=='           reduce using rule 48
+	'!='           reduce using rule 48
+	'&&'           reduce using rule 48
+	'||'           reduce using rule 48
+	'/'            reduce using rule 48
+	'*'            reduce using rule 48
+	'-'            reduce using rule 48
+	'%'            reduce using rule 48
+	','            reduce using rule 48
+	number         reduce using rule 48
+	string         reduce using rule 48
+	bool           reduce using rule 48
+	var            reduce using rule 48
+	cons           reduce using rule 48
+	unit           reduce using rule 48
 
-	Operation      goto state 110
-	Exp1           goto state 4
-	Exp2           goto state 5
 
 State 82
 
-	Operation -> Operation '<' . Operation              (rule 28)
+	Operation -> Operation '+' . Operation              (rule 27)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 109
+	Operation      goto state 111
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 83
 
-	Operation -> Operation '>' . Operation              (rule 30)
+	Operation -> Operation '<' . Operation              (rule 29)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 108
+	Operation      goto state 110
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 84
 
-	Operation -> Operation '<=' . Operation             (rule 29)
+	Operation -> Operation '>' . Operation              (rule 31)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 107
+	Operation      goto state 109
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 85
 
-	Operation -> Operation '>=' . Operation             (rule 31)
+	Operation -> Operation '<=' . Operation             (rule 30)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 106
+	Operation      goto state 108
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 86
 
-	Operation -> Operation '==' . Operation             (rule 35)
+	Operation -> Operation '>=' . Operation             (rule 32)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 105
+	Operation      goto state 107
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 87
 
-	Operation -> Operation '!=' . Operation             (rule 36)
+	Operation -> Operation '==' . Operation             (rule 36)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 104
+	Operation      goto state 106
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 88
 
-	Operation -> Operation '&&' . Operation             (rule 38)
+	Operation -> Operation '!=' . Operation             (rule 37)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 103
+	Operation      goto state 105
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 89
 
-	Operation -> Operation '||' . Operation             (rule 37)
+	Operation -> Operation '&&' . Operation             (rule 39)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 102
+	Operation      goto state 104
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 90
 
-	Operation -> Operation '/' . Operation              (rule 34)
+	Operation -> Operation '||' . Operation             (rule 38)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 101
+	Operation      goto state 103
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 91
 
-	Operation -> Operation '*' . Operation              (rule 32)
+	Operation -> Operation '/' . Operation              (rule 35)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 100
+	Operation      goto state 102
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 92
 
-	Operation -> Operation '-' . Operation              (rule 27)
+	Operation -> Operation '*' . Operation              (rule 33)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 99
+	Operation      goto state 101
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 93
 
-	Operation -> Operation '%' . Operation              (rule 33)
+	Operation -> Operation '-' . Operation              (rule 28)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 98
+	Operation      goto state 100
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 94
 
-	Operation -> Operation cons . Operation             (rule 39)
+	Operation -> Operation '%' . Operation              (rule 34)
 
-	'['            shift, and enter state 55
-	'('            shift, and enter state 56
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
 	number         shift, and enter state 12
-	bool           shift, and enter state 15
-	var            shift, and enter state 57
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
 
-	Operation      goto state 97
+	Operation      goto state 99
 	Exp1           goto state 4
 	Exp2           goto state 5
 
 State 95
 
+	Operation -> Operation cons . Operation             (rule 40)
+
+	'['            shift, and enter state 56
+	'('            shift, and enter state 57
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	bool           shift, and enter state 16
+	var            shift, and enter state 58
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+
+	Operation      goto state 98
+	Exp1           goto state 4
+	Exp2           goto state 5
+
+State 96
+
 	Stmt -> Expression ';' . Stmt                       (rule 1)
 
-	if             shift, and enter state 35
-	while          shift, and enter state 36
+	if             shift, and enter state 36
+	while          shift, and enter state 37
 	'['            shift, and enter state 7
 	'('            shift, and enter state 8
 	'!'            shift, and enter state 9
 	'-'            shift, and enter state 10
-	try            shift, and enter state 37
+	try            shift, and enter state 38
 	throw          shift, and enter state 11
 	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
 	fst            shift, and enter state 29
 	snd            shift, and enter state 30
+	include        shift, and enter state 31
 
-	Stmt           goto state 96
-	Selection_Stmt goto state 32
-	Iteration_Stmt goto state 33
-	Expression     goto state 34
+	Stmt           goto state 97
+	Selection_Stmt goto state 33
+	Iteration_Stmt goto state 34
+	Expression     goto state 35
 	Operation      goto state 3
 	Exp1           goto state 4
 	Exp2           goto state 5
 	Type           goto state 6
 
-State 96
+State 97
 
 	Stmt -> Expression ';' Stmt .                       (rule 1)
 
@@ -2149,171 +2201,60 @@ State 96
 	%eof           reduce using rule 1
 
 
-State 97
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-	Operation -> Operation cons Operation .             (rule 39)
-
-	'+'            reduce using rule 39
-	')'            reduce using rule 39
-	';'            reduce using rule 39
-	'<'            reduce using rule 39
-	'>'            reduce using rule 39
-	'<='           reduce using rule 39
-	'>='           reduce using rule 39
-	'=='           reduce using rule 39
-	'!='           reduce using rule 39
-	'&&'           reduce using rule 39
-	'||'           reduce using rule 39
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            reduce using rule 39
-	'%'            shift, and enter state 93
-	','            reduce using rule 39
-	cons           reduce using rule 39
-
-
 State 98
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation '%' Operation .              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+	Operation -> Operation cons Operation .             (rule 40)
 
-	'+'            reduce using rule 33
-	')'            reduce using rule 33
-	';'            reduce using rule 33
-	'<'            reduce using rule 33
-	'>'            reduce using rule 33
-	'<='           reduce using rule 33
-	'>='           reduce using rule 33
-	'=='           reduce using rule 33
-	'!='           reduce using rule 33
-	'&&'           reduce using rule 33
-	'||'           reduce using rule 33
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            reduce using rule 33
-	'%'            shift, and enter state 93
-	','            reduce using rule 33
-	cons           reduce using rule 33
+	'+'            reduce using rule 40
+	')'            reduce using rule 40
+	';'            reduce using rule 40
+	'<'            reduce using rule 40
+	'>'            reduce using rule 40
+	'<='           reduce using rule 40
+	'>='           reduce using rule 40
+	'=='           reduce using rule 40
+	'!='           reduce using rule 40
+	'&&'           reduce using rule 40
+	'||'           reduce using rule 40
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            reduce using rule 40
+	'%'            shift, and enter state 94
+	','            reduce using rule 40
+	cons           reduce using rule 40
 
 
 State 99
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation '-' Operation .              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-
-	'+'            reduce using rule 27
-	')'            reduce using rule 27
-	';'            reduce using rule 27
-	'<'            reduce using rule 27
-	'>'            reduce using rule 27
-	'<='           reduce using rule 27
-	'>='           reduce using rule 27
-	'=='           reduce using rule 27
-	'!='           reduce using rule 27
-	'&&'           reduce using rule 27
-	'||'           reduce using rule 27
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            reduce using rule 27
-	'%'            shift, and enter state 93
-	','            reduce using rule 27
-	cons           reduce using rule 27
-
-
-State 100
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation '*' Operation .              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-
-	'+'            reduce using rule 32
-	')'            reduce using rule 32
-	';'            reduce using rule 32
-	'<'            reduce using rule 32
-	'>'            reduce using rule 32
-	'<='           reduce using rule 32
-	'>='           reduce using rule 32
-	'=='           reduce using rule 32
-	'!='           reduce using rule 32
-	'&&'           reduce using rule 32
-	'||'           reduce using rule 32
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            reduce using rule 32
-	'%'            shift, and enter state 93
-	','            reduce using rule 32
-	cons           reduce using rule 32
-
-
-State 101
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation '/' Operation .              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation '%' Operation .              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
 	'+'            reduce using rule 34
 	')'            reduce using rule 34
@@ -2326,68 +2267,142 @@ State 101
 	'!='           reduce using rule 34
 	'&&'           reduce using rule 34
 	'||'           reduce using rule 34
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
 	'-'            reduce using rule 34
-	'%'            shift, and enter state 93
+	'%'            shift, and enter state 94
 	','            reduce using rule 34
 	cons           reduce using rule 34
 
 
+State 100
+
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation '-' Operation .              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+
+	'+'            reduce using rule 28
+	')'            reduce using rule 28
+	';'            reduce using rule 28
+	'<'            reduce using rule 28
+	'>'            reduce using rule 28
+	'<='           reduce using rule 28
+	'>='           reduce using rule 28
+	'=='           reduce using rule 28
+	'!='           reduce using rule 28
+	'&&'           reduce using rule 28
+	'||'           reduce using rule 28
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            reduce using rule 28
+	'%'            shift, and enter state 94
+	','            reduce using rule 28
+	cons           reduce using rule 28
+
+
+State 101
+
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation '*' Operation .              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+
+	'+'            reduce using rule 33
+	')'            reduce using rule 33
+	';'            reduce using rule 33
+	'<'            reduce using rule 33
+	'>'            reduce using rule 33
+	'<='           reduce using rule 33
+	'>='           reduce using rule 33
+	'=='           reduce using rule 33
+	'!='           reduce using rule 33
+	'&&'           reduce using rule 33
+	'||'           reduce using rule 33
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            reduce using rule 33
+	'%'            shift, and enter state 94
+	','            reduce using rule 33
+	cons           reduce using rule 33
+
+
 State 102
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation '||' Operation .             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation '/' Operation .              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            reduce using rule 37
-	')'            reduce using rule 37
-	';'            reduce using rule 37
-	'<'            reduce using rule 37
-	'>'            reduce using rule 37
-	'<='           reduce using rule 37
-	'>='           reduce using rule 37
-	'=='           reduce using rule 37
-	'!='           reduce using rule 37
-	'&&'           reduce using rule 37
-	'||'           reduce using rule 37
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            reduce using rule 37
-	'%'            shift, and enter state 93
-	','            reduce using rule 37
-	cons           reduce using rule 37
+	'+'            reduce using rule 35
+	')'            reduce using rule 35
+	';'            reduce using rule 35
+	'<'            reduce using rule 35
+	'>'            reduce using rule 35
+	'<='           reduce using rule 35
+	'>='           reduce using rule 35
+	'=='           reduce using rule 35
+	'!='           reduce using rule 35
+	'&&'           reduce using rule 35
+	'||'           reduce using rule 35
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            reduce using rule 35
+	'%'            shift, and enter state 94
+	','            reduce using rule 35
+	cons           reduce using rule 35
 
 
 State 103
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation '&&' Operation .             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation '||' Operation .             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
 	'+'            reduce using rule 38
 	')'            reduce using rule 38
@@ -2400,33 +2415,107 @@ State 103
 	'!='           reduce using rule 38
 	'&&'           reduce using rule 38
 	'||'           reduce using rule 38
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
 	'-'            reduce using rule 38
-	'%'            shift, and enter state 93
+	'%'            shift, and enter state 94
 	','            reduce using rule 38
 	cons           reduce using rule 38
 
 
 State 104
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation '!=' Operation .             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation '&&' Operation .             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            shift, and enter state 81
+	'+'            reduce using rule 39
+	')'            reduce using rule 39
+	';'            reduce using rule 39
+	'<'            reduce using rule 39
+	'>'            reduce using rule 39
+	'<='           reduce using rule 39
+	'>='           reduce using rule 39
+	'=='           reduce using rule 39
+	'!='           reduce using rule 39
+	'&&'           reduce using rule 39
+	'||'           reduce using rule 39
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            reduce using rule 39
+	'%'            shift, and enter state 94
+	','            reduce using rule 39
+	cons           reduce using rule 39
+
+
+State 105
+
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation '!=' Operation .             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+
+	'+'            shift, and enter state 82
+	')'            reduce using rule 37
+	';'            reduce using rule 37
+	'<'            fail
+	'>'            fail
+	'<='           fail
+	'>='           fail
+	'=='           fail
+	'!='           fail
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
+	','            reduce using rule 37
+	cons           shift, and enter state 95
+
+
+State 106
+
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation '==' Operation .             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
+
+	'+'            shift, and enter state 82
 	')'            reduce using rule 36
 	';'            reduce using rule 36
 	'<'            fail
@@ -2435,146 +2524,72 @@ State 104
 	'>='           fail
 	'=='           fail
 	'!='           fail
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
 	','            reduce using rule 36
-	cons           shift, and enter state 94
-
-
-State 105
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation '==' Operation .             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-
-	'+'            shift, and enter state 81
-	')'            reduce using rule 35
-	';'            reduce using rule 35
-	'<'            fail
-	'>'            fail
-	'<='           fail
-	'>='           fail
-	'=='           fail
-	'!='           fail
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
-	','            reduce using rule 35
-	cons           shift, and enter state 94
-
-
-State 106
-
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation '>=' Operation .             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
-
-	'+'            shift, and enter state 81
-	')'            reduce using rule 31
-	';'            reduce using rule 31
-	'<'            fail
-	'>'            fail
-	'<='           fail
-	'>='           fail
-	'=='           fail
-	'!='           fail
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
-	','            reduce using rule 31
-	cons           shift, and enter state 94
+	cons           shift, and enter state 95
 
 
 State 107
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation '<=' Operation .             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation '>=' Operation .             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            shift, and enter state 81
-	')'            reduce using rule 29
-	';'            reduce using rule 29
+	'+'            shift, and enter state 82
+	')'            reduce using rule 32
+	';'            reduce using rule 32
 	'<'            fail
 	'>'            fail
 	'<='           fail
 	'>='           fail
 	'=='           fail
 	'!='           fail
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
-	','            reduce using rule 29
-	cons           shift, and enter state 94
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
+	','            reduce using rule 32
+	cons           shift, and enter state 95
 
 
 State 108
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation '>' Operation .              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation '<=' Operation .             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            shift, and enter state 81
+	'+'            shift, and enter state 82
 	')'            reduce using rule 30
 	';'            reduce using rule 30
 	'<'            fail
@@ -2583,255 +2598,189 @@ State 108
 	'>='           fail
 	'=='           fail
 	'!='           fail
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
 	','            reduce using rule 30
-	cons           shift, and enter state 94
+	cons           shift, and enter state 95
 
 
 State 109
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation '<' Operation .              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation '>' Operation .              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            shift, and enter state 81
-	')'            reduce using rule 28
-	';'            reduce using rule 28
+	'+'            shift, and enter state 82
+	')'            reduce using rule 31
+	';'            reduce using rule 31
 	'<'            fail
 	'>'            fail
 	'<='           fail
 	'>='           fail
 	'=='           fail
 	'!='           fail
-	'&&'           shift, and enter state 88
-	'||'           shift, and enter state 89
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            shift, and enter state 92
-	'%'            shift, and enter state 93
-	','            reduce using rule 28
-	cons           shift, and enter state 94
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
+	','            reduce using rule 31
+	cons           shift, and enter state 95
 
 
 State 110
 
-	Operation -> Operation . '+' Operation              (rule 26)
-	Operation -> Operation '+' Operation .              (rule 26)
-	Operation -> Operation . '-' Operation              (rule 27)
-	Operation -> Operation . '<' Operation              (rule 28)
-	Operation -> Operation . '<=' Operation             (rule 29)
-	Operation -> Operation . '>' Operation              (rule 30)
-	Operation -> Operation . '>=' Operation             (rule 31)
-	Operation -> Operation . '*' Operation              (rule 32)
-	Operation -> Operation . '%' Operation              (rule 33)
-	Operation -> Operation . '/' Operation              (rule 34)
-	Operation -> Operation . '==' Operation             (rule 35)
-	Operation -> Operation . '!=' Operation             (rule 36)
-	Operation -> Operation . '||' Operation             (rule 37)
-	Operation -> Operation . '&&' Operation             (rule 38)
-	Operation -> Operation . cons Operation             (rule 39)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation '<' Operation .              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	'+'            reduce using rule 26
-	')'            reduce using rule 26
-	';'            reduce using rule 26
-	'<'            reduce using rule 26
-	'>'            reduce using rule 26
-	'<='           reduce using rule 26
-	'>='           reduce using rule 26
-	'=='           reduce using rule 26
-	'!='           reduce using rule 26
-	'&&'           reduce using rule 26
-	'||'           reduce using rule 26
-	'/'            shift, and enter state 90
-	'*'            shift, and enter state 91
-	'-'            reduce using rule 26
-	'%'            shift, and enter state 93
-	','            reduce using rule 26
-	cons           reduce using rule 26
+	'+'            shift, and enter state 82
+	')'            reduce using rule 29
+	';'            reduce using rule 29
+	'<'            fail
+	'>'            fail
+	'<='           fail
+	'>='           fail
+	'=='           fail
+	'!='           fail
+	'&&'           shift, and enter state 89
+	'||'           shift, and enter state 90
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            shift, and enter state 93
+	'%'            shift, and enter state 94
+	','            reduce using rule 29
+	cons           shift, and enter state 95
 
 
 State 111
 
-	Type -> Type . '->' Type                            (rule 68)
-	Type -> Type '->' Type .                            (rule 68)
+	Operation -> Operation . '+' Operation              (rule 27)
+	Operation -> Operation '+' Operation .              (rule 27)
+	Operation -> Operation . '-' Operation              (rule 28)
+	Operation -> Operation . '<' Operation              (rule 29)
+	Operation -> Operation . '<=' Operation             (rule 30)
+	Operation -> Operation . '>' Operation              (rule 31)
+	Operation -> Operation . '>=' Operation             (rule 32)
+	Operation -> Operation . '*' Operation              (rule 33)
+	Operation -> Operation . '%' Operation              (rule 34)
+	Operation -> Operation . '/' Operation              (rule 35)
+	Operation -> Operation . '==' Operation             (rule 36)
+	Operation -> Operation . '!=' Operation             (rule 37)
+	Operation -> Operation . '||' Operation             (rule 38)
+	Operation -> Operation . '&&' Operation             (rule 39)
+	Operation -> Operation . cons Operation             (rule 40)
 
-	']'            reduce using rule 68
-	')'            reduce using rule 68
-	','            reduce using rule 68
-	var            reduce using rule 68
-	'->'           shift, and enter state 78
+	'+'            reduce using rule 27
+	')'            reduce using rule 27
+	';'            reduce using rule 27
+	'<'            reduce using rule 27
+	'>'            reduce using rule 27
+	'<='           reduce using rule 27
+	'>='           reduce using rule 27
+	'=='           reduce using rule 27
+	'!='           reduce using rule 27
+	'&&'           reduce using rule 27
+	'||'           reduce using rule 27
+	'/'            shift, and enter state 91
+	'*'            shift, and enter state 92
+	'-'            reduce using rule 27
+	'%'            shift, and enter state 94
+	','            reduce using rule 27
+	cons           reduce using rule 27
 
 
 State 112
 
-	Type -> Type . '->' Type                            (rule 68)
-	Type -> '(' Type . ')'                              (rule 69)
-	Type -> '(' Type . ',' Type ')'                     (rule 70)
-
-	')'            shift, and enter state 114
-	','            shift, and enter state 115
-	'->'           shift, and enter state 78
-
-
-State 113
-
-	Type -> '[' Type ']' .                              (rule 67)
-
-	']'            reduce using rule 67
-	')'            reduce using rule 67
-	','            reduce using rule 67
-	var            reduce using rule 67
-	'->'           reduce using rule 67
-
-
-State 114
-
-	Type -> '(' Type ')' .                              (rule 69)
+	Type -> Type . '->' Type                            (rule 69)
+	Type -> Type '->' Type .                            (rule 69)
 
 	']'            reduce using rule 69
 	')'            reduce using rule 69
 	','            reduce using rule 69
 	var            reduce using rule 69
-	'->'           reduce using rule 69
+	'->'           shift, and enter state 79
+
+
+State 113
+
+	Type -> Type . '->' Type                            (rule 69)
+	Type -> '(' Type . ')'                              (rule 70)
+	Type -> '(' Type . ',' Type ')'                     (rule 71)
+
+	')'            shift, and enter state 115
+	','            shift, and enter state 116
+	'->'           shift, and enter state 79
+
+
+State 114
+
+	Type -> '[' Type ']' .                              (rule 68)
+
+	']'            reduce using rule 68
+	')'            reduce using rule 68
+	','            reduce using rule 68
+	var            reduce using rule 68
+	'->'           reduce using rule 68
 
 
 State 115
 
-	Type -> '(' Type ',' . Type ')'                     (rule 70)
+	Type -> '(' Type ')' .                              (rule 70)
 
-	'['            shift, and enter state 74
-	'('            shift, and enter state 76
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	unit           shift, and enter state 26
+	']'            reduce using rule 70
+	')'            reduce using rule 70
+	','            reduce using rule 70
+	var            reduce using rule 70
+	'->'           reduce using rule 70
 
-	Type           goto state 134
 
 State 116
 
-	Exp2 -> '(' Expression ')' .                        (rule 49)
+	Type -> '(' Type ',' . Type ')'                     (rule 71)
 
-	'+'            reduce using rule 49
-	'['            reduce using rule 49
-	'('            reduce using rule 49
-	')'            reduce using rule 49
-	';'            reduce using rule 49
-	'<'            reduce using rule 49
-	'>'            reduce using rule 49
-	'<='           reduce using rule 49
-	'>='           reduce using rule 49
-	'=='           reduce using rule 49
-	'!='           reduce using rule 49
-	'&&'           reduce using rule 49
-	'||'           reduce using rule 49
-	'/'            reduce using rule 49
-	'*'            reduce using rule 49
-	'-'            reduce using rule 49
-	'%'            reduce using rule 49
-	','            reduce using rule 49
-	number         reduce using rule 49
-	bool           reduce using rule 49
-	var            reduce using rule 49
-	cons           reduce using rule 49
-	unit           reduce using rule 49
-	quote          reduce using rule 49
+	'['            shift, and enter state 75
+	'('            shift, and enter state 77
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	unit           shift, and enter state 27
 
+	Type           goto state 134
 
 State 117
 
-	Exp2 -> '(' Expression ',' . Expression ')'         (rule 54)
-
-	'['            shift, and enter state 7
-	'('            shift, and enter state 8
-	'!'            shift, and enter state 9
-	'-'            shift, and enter state 10
-	throw          shift, and enter state 11
-	number         shift, and enter state 12
-	intT           shift, and enter state 13
-	char           shift, and enter state 14
-	bool           shift, and enter state 15
-	boolT          shift, and enter state 16
-	void           shift, and enter state 17
-	var            shift, and enter state 18
-	print          shift, and enter state 19
-	head           shift, and enter state 20
-	tail           shift, and enter state 21
-	isEmpty        shift, and enter state 22
-	consume        shift, and enter state 23
-	streams        shift, and enter state 24
-	lambda         shift, and enter state 25
-	unit           shift, and enter state 26
-	return         shift, and enter state 27
-	quote          shift, and enter state 28
-	fst            shift, and enter state 29
-	snd            shift, and enter state 30
-
-	Expression     goto state 133
-	Operation      goto state 3
-	Exp1           goto state 4
-	Exp2           goto state 5
-	Type           goto state 6
-
-State 118
-
-	Expression -> var '=' Expression .                  (rule 13)
-
-	')'            reduce using rule 13
-	';'            reduce using rule 13
-	','            reduce using rule 13
-
-
-State 119
-
-	Expression -> var '=' unit .                        (rule 14)
-	Type -> unit .                                      (rule 66)
-
-	')'            reduce using rule 14
-	';'            reduce using rule 14
-	','            reduce using rule 14
-	var            reduce using rule 66
-	'->'           reduce using rule 66
-
-
-State 120
-
-	Expression -> lambda unit '->' . Compound_Stmt      (rule 25)
-
-	'{'            shift, and enter state 39
-
-	Compound_Stmt  goto state 132
-
-State 121
-
-	Expression -> lambda '(' Type . var ')' '->' Compound_Stmt    (rule 24)
-	Type -> Type . '->' Type                            (rule 68)
-
-	var            shift, and enter state 131
-	'->'           shift, and enter state 78
-
-
-State 122
-
-	Exp2 -> quote var quote .                           (rule 50)
+	Exp2 -> '(' Expression ')' .                        (rule 50)
 
 	'+'            reduce using rule 50
 	'['            reduce using rule 50
@@ -2852,11 +2801,85 @@ State 122
 	'%'            reduce using rule 50
 	','            reduce using rule 50
 	number         reduce using rule 50
+	string         reduce using rule 50
 	bool           reduce using rule 50
 	var            reduce using rule 50
 	cons           reduce using rule 50
 	unit           reduce using rule 50
-	quote          reduce using rule 50
+
+
+State 118
+
+	Exp2 -> '(' Expression ',' . Expression ')'         (rule 55)
+
+	'['            shift, and enter state 7
+	'('            shift, and enter state 8
+	'!'            shift, and enter state 9
+	'-'            shift, and enter state 10
+	throw          shift, and enter state 11
+	number         shift, and enter state 12
+	string         shift, and enter state 13
+	intT           shift, and enter state 14
+	char           shift, and enter state 15
+	bool           shift, and enter state 16
+	boolT          shift, and enter state 17
+	void           shift, and enter state 18
+	var            shift, and enter state 19
+	print          shift, and enter state 20
+	head           shift, and enter state 21
+	tail           shift, and enter state 22
+	isEmpty        shift, and enter state 23
+	consume        shift, and enter state 24
+	streams        shift, and enter state 25
+	lambda         shift, and enter state 26
+	unit           shift, and enter state 27
+	return         shift, and enter state 28
+	fst            shift, and enter state 29
+	snd            shift, and enter state 30
+	include        shift, and enter state 31
+
+	Expression     goto state 133
+	Operation      goto state 3
+	Exp1           goto state 4
+	Exp2           goto state 5
+	Type           goto state 6
+
+State 119
+
+	Expression -> var '=' Expression .                  (rule 13)
+
+	')'            reduce using rule 13
+	';'            reduce using rule 13
+	','            reduce using rule 13
+
+
+State 120
+
+	Expression -> var '=' unit .                        (rule 14)
+	Type -> unit .                                      (rule 67)
+
+	')'            reduce using rule 14
+	';'            reduce using rule 14
+	','            reduce using rule 14
+	var            reduce using rule 67
+	'->'           reduce using rule 67
+
+
+State 121
+
+	Expression -> lambda unit '->' . Compound_Stmt      (rule 25)
+
+	'{'            shift, and enter state 40
+
+	Compound_Stmt  goto state 132
+
+State 122
+
+	Expression -> lambda '(' Type . var ')' '->' Compound_Stmt    (rule 24)
+	Type -> Type . '->' Type                            (rule 69)
+
+	var            shift, and enter state 131
+	'->'           shift, and enter state 79
 
 
 State 123
@@ -2892,12 +2915,12 @@ State 127
 
 	Selection_Stmt -> try Compound_Stmt catch '(' . Exception ')' Compound_Stmt    (rule 9)
 
-	NullPointerExceptionshift, and enter state 63
-	StreamsNotInitialisedExceptionshift, and enter state 64
-	NotExistingStreamConsumptionExceptionshift, and enter state 65
-	DivideByZeroExceptionshift, and enter state 66
-	TrapException  shift, and enter state 67
-	ListEmptyExceptionshift, and enter state 68
+	NullPointerExceptionshift, and enter state 64
+	StreamsNotInitialisedExceptionshift, and enter state 65
+	NotExistingStreamConsumptionExceptionshift, and enter state 66
+	DivideByZeroExceptionshift, and enter state 67
+	TrapException  shift, and enter state 68
+	ListEmptyExceptionshift, and enter state 69
 
 	Exception      goto state 140
 
@@ -2920,6 +2943,7 @@ State 128
 	try            reduce using rule 11
 	throw          reduce using rule 11
 	number         reduce using rule 11
+	string         reduce using rule 11
 	intT           reduce using rule 11
 	char           reduce using rule 11
 	bool           reduce using rule 11
@@ -2935,9 +2959,9 @@ State 128
 	lambda         reduce using rule 11
 	unit           reduce using rule 11
 	return         reduce using rule 11
-	quote          reduce using rule 11
 	fst            reduce using rule 11
 	snd            reduce using rule 11
+	include        reduce using rule 11
 	%eof           reduce using rule 11
 
 
@@ -2945,7 +2969,7 @@ State 129
 
 	Iteration_Stmt -> while '(' Expression ')' . Compound_Stmt    (rule 10)
 
-	'{'            shift, and enter state 39
+	'{'            shift, and enter state 40
 
 	Compound_Stmt  goto state 139
 
@@ -2954,7 +2978,7 @@ State 130
 	Selection_Stmt -> if '(' Expression ')' . Compound_Stmt else Compound_Stmt    (rule 7)
 	Selection_Stmt -> if '(' Expression ')' . Compound_Stmt    (rule 8)
 
-	'{'            shift, and enter state 39
+	'{'            shift, and enter state 40
 
 	Compound_Stmt  goto state 138
 
@@ -2976,59 +3000,59 @@ State 132
 
 State 133
 
-	Exp2 -> '(' Expression ',' Expression . ')'         (rule 54)
+	Exp2 -> '(' Expression ',' Expression . ')'         (rule 55)
 
 	')'            shift, and enter state 136
 
 
 State 134
 
-	Type -> Type . '->' Type                            (rule 68)
-	Type -> '(' Type ',' Type . ')'                     (rule 70)
+	Type -> Type . '->' Type                            (rule 69)
+	Type -> '(' Type ',' Type . ')'                     (rule 71)
 
 	')'            shift, and enter state 135
-	'->'           shift, and enter state 78
+	'->'           shift, and enter state 79
 
 
 State 135
 
-	Type -> '(' Type ',' Type ')' .                     (rule 70)
+	Type -> '(' Type ',' Type ')' .                     (rule 71)
 
-	']'            reduce using rule 70
-	')'            reduce using rule 70
-	','            reduce using rule 70
-	var            reduce using rule 70
-	'->'           reduce using rule 70
+	']'            reduce using rule 71
+	')'            reduce using rule 71
+	','            reduce using rule 71
+	var            reduce using rule 71
+	'->'           reduce using rule 71
 
 
 State 136
 
-	Exp2 -> '(' Expression ',' Expression ')' .         (rule 54)
+	Exp2 -> '(' Expression ',' Expression ')' .         (rule 55)
 
-	'+'            reduce using rule 54
-	'['            reduce using rule 54
-	'('            reduce using rule 54
-	')'            reduce using rule 54
-	';'            reduce using rule 54
-	'<'            reduce using rule 54
-	'>'            reduce using rule 54
-	'<='           reduce using rule 54
-	'>='           reduce using rule 54
-	'=='           reduce using rule 54
-	'!='           reduce using rule 54
-	'&&'           reduce using rule 54
-	'||'           reduce using rule 54
-	'/'            reduce using rule 54
-	'*'            reduce using rule 54
-	'-'            reduce using rule 54
-	'%'            reduce using rule 54
-	','            reduce using rule 54
-	number         reduce using rule 54
-	bool           reduce using rule 54
-	var            reduce using rule 54
-	cons           reduce using rule 54
-	unit           reduce using rule 54
-	quote          reduce using rule 54
+	'+'            reduce using rule 55
+	'['            reduce using rule 55
+	'('            reduce using rule 55
+	')'            reduce using rule 55
+	';'            reduce using rule 55
+	'<'            reduce using rule 55
+	'>'            reduce using rule 55
+	'<='           reduce using rule 55
+	'>='           reduce using rule 55
+	'=='           reduce using rule 55
+	'!='           reduce using rule 55
+	'&&'           reduce using rule 55
+	'||'           reduce using rule 55
+	'/'            reduce using rule 55
+	'*'            reduce using rule 55
+	'-'            reduce using rule 55
+	'%'            reduce using rule 55
+	','            reduce using rule 55
+	number         reduce using rule 55
+	string         reduce using rule 55
+	bool           reduce using rule 55
+	var            reduce using rule 55
+	cons           reduce using rule 55
+	unit           reduce using rule 55
 
 
 State 137
@@ -3054,6 +3078,7 @@ State 138
 	try            reduce using rule 8
 	throw          reduce using rule 8
 	number         reduce using rule 8
+	string         reduce using rule 8
 	intT           reduce using rule 8
 	char           reduce using rule 8
 	bool           reduce using rule 8
@@ -3069,9 +3094,9 @@ State 138
 	lambda         reduce using rule 8
 	unit           reduce using rule 8
 	return         reduce using rule 8
-	quote          reduce using rule 8
 	fst            reduce using rule 8
 	snd            reduce using rule 8
+	include        reduce using rule 8
 	%eof           reduce using rule 8
 
 
@@ -3089,6 +3114,7 @@ State 139
 	try            reduce using rule 10
 	throw          reduce using rule 10
 	number         reduce using rule 10
+	string         reduce using rule 10
 	intT           reduce using rule 10
 	char           reduce using rule 10
 	bool           reduce using rule 10
@@ -3104,9 +3130,9 @@ State 139
 	lambda         reduce using rule 10
 	unit           reduce using rule 10
 	return         reduce using rule 10
-	quote          reduce using rule 10
 	fst            reduce using rule 10
 	snd            reduce using rule 10
+	include        reduce using rule 10
 	%eof           reduce using rule 10
 
 
@@ -3121,7 +3147,7 @@ State 141
 
 	Selection_Stmt -> try Compound_Stmt catch '(' Exception ')' . Compound_Stmt    (rule 9)
 
-	'{'            shift, and enter state 39
+	'{'            shift, and enter state 40
 
 	Compound_Stmt  goto state 146
 
@@ -3129,7 +3155,7 @@ State 142
 
 	Selection_Stmt -> if '(' Expression ')' Compound_Stmt else . Compound_Stmt    (rule 7)
 
-	'{'            shift, and enter state 39
+	'{'            shift, and enter state 40
 
 	Compound_Stmt  goto state 145
 
@@ -3137,7 +3163,7 @@ State 143
 
 	Expression -> lambda '(' Type var ')' '->' . Compound_Stmt    (rule 24)
 
-	'{'            shift, and enter state 39
+	'{'            shift, and enter state 40
 
 	Compound_Stmt  goto state 144
 
@@ -3164,6 +3190,7 @@ State 145
 	try            reduce using rule 7
 	throw          reduce using rule 7
 	number         reduce using rule 7
+	string         reduce using rule 7
 	intT           reduce using rule 7
 	char           reduce using rule 7
 	bool           reduce using rule 7
@@ -3179,9 +3206,9 @@ State 145
 	lambda         reduce using rule 7
 	unit           reduce using rule 7
 	return         reduce using rule 7
-	quote          reduce using rule 7
 	fst            reduce using rule 7
 	snd            reduce using rule 7
+	include        reduce using rule 7
 	%eof           reduce using rule 7
 
 
@@ -3199,6 +3226,7 @@ State 146
 	try            reduce using rule 9
 	throw          reduce using rule 9
 	number         reduce using rule 9
+	string         reduce using rule 9
 	intT           reduce using rule 9
 	char           reduce using rule 9
 	bool           reduce using rule 9
@@ -3214,16 +3242,16 @@ State 146
 	lambda         reduce using rule 9
 	unit           reduce using rule 9
 	return         reduce using rule 9
-	quote          reduce using rule 9
 	fst            reduce using rule 9
 	snd            reduce using rule 9
+	include        reduce using rule 9
 	%eof           reduce using rule 9
 
 
 -----------------------------------------------------------------------------
 Grammar Totals
 -----------------------------------------------------------------------------
-Number of rules: 71
-Number of terminals: 57
+Number of rules: 72
+Number of terminals: 58
 Number of non-terminals: 11
 Number of states: 147

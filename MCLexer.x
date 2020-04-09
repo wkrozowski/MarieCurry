@@ -78,6 +78,8 @@ tokens :-
   return  {\p s -> MkToken p TokenReturn}
   fst     {\p s -> MkToken p TokenFst}
   snd     {\p s -> MkToken p TokenSnd}
+  include {\p s -> MkToken p TokenInclude}
+
   NullPointerException                    {\p s -> MkToken p TokenNPE}
   StreamsNotInitialisedException          {\p s -> MkToken p TokenSNIE}
   NotExistingStreamConsumptionException   {\p s -> MkToken p TokenNESCE}
@@ -150,7 +152,8 @@ data TokenClass =
   TokenTChar                  |
   TokenComma                  |
   TokenFst                    |
-  TokenSnd
+  TokenSnd                    |
+  TokenInclude
     deriving (Show,Eq)
 
 trimString :: String -> String

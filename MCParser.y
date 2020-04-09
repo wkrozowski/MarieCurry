@@ -60,6 +60,7 @@ import SyntaxCheck
       return          { MkToken _ TokenReturn}
       fst             { MkToken _ TokenFst}
       snd             { MkToken _ TokenSnd}
+      include         { MkToken _ TokenInclude}  
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}
@@ -104,6 +105,8 @@ Expression : Operation                      {$1}
            | throw Exception                {ThrowStmt $2}
            | lambda '(' Type var ')' '->' Compound_Stmt  {LamExpr $3 $4 $7}
            | lambda unit '->' Compound_Stmt {LamExpr UnitT "()" $4}
+           | include string                  {Include $2}
+
 
 Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | Operation '-'  Operation     {SubtractOp $1 $3}
@@ -159,7 +162,8 @@ Type : boolT             {BoolT}
 {
 
 
-data Stmt = Stmt Stmt Stmt
+data Stmt =      Include String
+               | Stmt Stmt Stmt
                | IfStmtElse Stmt Stmt Stmt
                | IfStmt Stmt Stmt
                | WhileStmt Stmt Stmt
@@ -223,7 +227,6 @@ data Type     = IntT
               | CharT
               | PairT Type Type
               deriving (Show, Eq)
-
 
 parseError :: [Token] -> a
 parseError input = errorWithoutStackTrace (parseErrorMessage (line token) (column token) ++ "\n" ++ guessCauseOfError tokenClasses)
