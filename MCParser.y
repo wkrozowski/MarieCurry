@@ -35,6 +35,7 @@ import SyntaxCheck
       '*'             { MkToken _ TokenMultiply}
       '-'             { MkToken _ TokenSubtract }
       '%'             { MkToken _ TokenModulo}
+      ','             { MkToken _ TokenComma } 
       catch           { MkToken _ TokenCatch}
       try             { MkToken _ TokenTry}
       throw           { MkToken _ TokenThrow}
@@ -57,6 +58,8 @@ import SyntaxCheck
       unit            { MkToken _ TokenUnit}
       return          { MkToken _ TokenReturn}
       quote           { MkToken _ TokenQuote}
+      fst             { MkToken _ TokenFst}
+      snd             { MkToken _ TokenSnd}
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}
@@ -94,6 +97,8 @@ Expression : Operation                      {$1}
            | print Expression               {PrintOp $2}
            | consume Expression             {ConsumeStream $2}
            | streams Expression             {Streams $2}
+           | fst Expression                 {First $2}
+           | snd Expression              {Second $2}
            | return Expression              {ReturnOp $2}
            | return unit                    {ReturnOp UnitVal}
            | throw Exception                {ThrowStmt $2}
@@ -131,6 +136,7 @@ Exp2 : '(' Expression ')'                                                  {$2}
      | var                                                                {Variable $1}
      | bool                                                               {BoolVal $1}
      | number                                                             {NumVal $1}
+     | '(' Expression ',' Expression ')'                                  {PairVal $2 $4}
      | '[' ']'                                                            {EmptyListVal}
 
 Exception : NullPointerException                  {NullPointer}
@@ -148,6 +154,7 @@ Type : boolT             {BoolT}
      | '[' Type ']'      {ListT $2}
      | Type '->' Type    {ArrowT $1 $3}
      | '(' Type ')'      {$2}
+     | '(' Type ',' Type ')' {PairT $2 $4}
 
 {
 
@@ -191,6 +198,9 @@ data Stmt = Stmt Stmt Stmt
                | ConsOp Stmt Stmt
                | EmptyListVal
                | ReturnOp Stmt
+               | PairVal Stmt Stmt
+               | First Stmt
+               | Second Stmt
                deriving (Show)
 
 data ExceptionType = NullPointer
@@ -211,6 +221,7 @@ data Type     = IntT
               | EmptyListT
               | ArrowT Type Type
               | CharT
+              | PairT Type Type
               deriving (Show, Eq)
 
 
