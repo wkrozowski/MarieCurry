@@ -5,8 +5,25 @@ module MCLexer where
 %wrapper "posn"
 $digit = 0-9
 -- digits
-$alpha = [a-zA-Z]
--- alphabetic characters
+$ascsymbol = [\!\#\$\%\&\*\+\.\/\<\=\>\?\@\\\^\|\-\~]
+$unisymbol = [] -- TODO
+$special   = [\(\)\,\;\[\]\`\{\}]
+$symbol    = [$ascsymbol $unisymbol] # [$special \_\:\"\']
+$whitechar = [ \t\n\r\f\v]
+$large     = [A-Z \xc0-\xd6 \xd8-\xde]
+$small     = [a-z \xdf-\xf6 \xf8-\xff \_]
+$alpha     = [$small $large]
+$graphic   = [$small $large $symbol $digit $special \:\"\']
+@decimal     = $digit+
+$cntrl   = [$large \@\[\\\]\^\_]
+@ascii   = \^ $cntrl | NUL | SOH | STX | ETX | EOT | ENQ | ACK
+	 | BEL | BS | HT | LF | VT | FF | CR | SO | SI | DLE
+	 | DC1 | DC2 | DC3 | DC4 | NAK | SYN | ETB | CAN | EM
+	 | SUB | ESC | FS | GS | RS | US | SP | DEL
+$charesc = [abfnrtv\\\"\'\&]
+@escape  = \\ ($charesc | @ascii | @decimal)
+@gap     = \\ $whitechar+ \\
+@string  = $graphic # [\"\\] | " " | @escape | @gap
 
 tokens :-
   $white+       ;
@@ -31,7 +48,6 @@ tokens :-
   tail    {\p s -> MkToken p TokenTail}
   isEmpty {\p s -> MkToken p TokenIsEmpty}
   cons    {\p s -> MkToken p TokenCons}
-  \"      {\p s -> MkToken p TokenQuote}
   "="     {\p s -> MkToken p TokenEq }
   "<"     {\p s -> MkToken p TokenLessThan }
   "<="    {\p s -> MkToken p TokenLessThanEq }
@@ -66,6 +82,7 @@ tokens :-
   TrapException                           {\p s -> MkToken p TokenTE}
   ListEmptyException                      {\p s -> MkToken p TokenLEE}
   $alpha [$alpha $digit \_ \’]*           {\p s -> MkToken p (TokenVar s)}
+  \" @string* \"		                      {\p s -> MkToken p (TokenString $ trimString s) }
 
 {
 
@@ -77,6 +94,7 @@ data TokenClass =
   TokenNum          Int       |
   TokenBool         Bool      |
   TokenVar          String    |
+  TokenString       String    |
   TokenIf                     |
   TokenElse                   |
   TokenWhile                  |
@@ -126,9 +144,11 @@ data TokenClass =
   TokenIsEmpty                |
   TokenCons                   |
   TokenReturn                 |
-  TokenQuote                  |
-  TokenTChar                  
+  TokenTChar
     deriving (Show,Eq)
+
+trimString :: String -> String
+trimString xs = [x| x <- xs, not (x == '\"')]
 
 tokenPosn :: Token -> (Int, Int)
 tokenPosn (MkToken (AlexPn _ line col) _) = (line, col)

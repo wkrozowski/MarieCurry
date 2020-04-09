@@ -39,6 +39,7 @@ import SyntaxCheck
       try             { MkToken _ TokenTry}
       throw           { MkToken _ TokenThrow}
       number          { MkToken _ (TokenNum $$)}
+      string          { MkToken _ (TokenString $$)}
       intT            { MkToken _ TokenTInt}
       char            { MkToken _ TokenTChar}
       bool            { MkToken _ (TokenBool $$)}
@@ -56,7 +57,6 @@ import SyntaxCheck
       '->'            { MkToken _ TokenArrow}
       unit            { MkToken _ TokenUnit}
       return          { MkToken _ TokenReturn}
-      quote           { MkToken _ TokenQuote}
       NullPointerException                  { MkToken _ TokenNPE}
       StreamsNotInitialisedException        { MkToken _ TokenSNIE}
       NotExistingStreamConsumptionException { MkToken _ TokenNESCE}
@@ -127,7 +127,7 @@ Exp1           : Exp1 Exp2                    {Application $1 $2}
 
 
 Exp2 : '(' Expression ')'                                                  {$2}
-     | quote var quote                                                    {StringVal $2}
+     | string                                                             {StringVal $1}
      | var                                                                {Variable $1}
      | bool                                                               {BoolVal $1}
      | number                                                             {NumVal $1}
