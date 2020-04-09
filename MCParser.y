@@ -58,7 +58,6 @@ import SyntaxCheck
       '->'            { MkToken _ TokenArrow}
       unit            { MkToken _ TokenUnit}
       return          { MkToken _ TokenReturn}
-      quote           { MkToken _ TokenQuote}
       fst             { MkToken _ TokenFst}
       snd             { MkToken _ TokenSnd}
       NullPointerException                  { MkToken _ TokenNPE}
