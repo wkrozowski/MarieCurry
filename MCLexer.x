@@ -74,7 +74,10 @@ tokens :-
   \\      {\p s -> MkToken p TokenLambda}
   "->"    {\p s -> MkToken p TokenArrow}
   "()"    {\p s -> MkToken p TokenUnit}
+  ","     {\p s -> MkToken p TokenComma}
   return  {\p s -> MkToken p TokenReturn}
+  fst     {\p s -> MkToken p TokenFst}
+  snd     {\p s -> MkToken p TokenSnd}
   NullPointerException                    {\p s -> MkToken p TokenNPE}
   StreamsNotInitialisedException          {\p s -> MkToken p TokenSNIE}
   NotExistingStreamConsumptionException   {\p s -> MkToken p TokenNESCE}
@@ -144,7 +147,15 @@ data TokenClass =
   TokenIsEmpty                |
   TokenCons                   |
   TokenReturn                 |
+<<<<<<< HEAD
   TokenTChar
+=======
+  TokenQuote                  |
+  TokenTChar                  |
+  TokenComma                  |
+  TokenFst                    |
+  TokenSnd
+>>>>>>> 37e0abb5d995f7adfa6fa51ff7ae47413a94bd36
     deriving (Show,Eq)
 
 trimString :: String -> String

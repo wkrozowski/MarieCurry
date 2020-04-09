@@ -33,6 +33,8 @@ data UnaryOpType =
             | Head
             | Tail
             | ListIsEmpty
+            | FstOp
+            | SndOp
                 deriving (Eq, Show)
 
 data OpType =
@@ -80,6 +82,7 @@ data Code =   Null
             | App Code Code
             | Unit
             | List ListContents
+            | Pair Code Code
                 deriving (Show, Eq)
 
 data Frame =  Branch Code Code Environment
@@ -94,6 +97,8 @@ data Frame =  Branch Code Code Environment
             | AppHole Code
             | Global Environment
             | EvalConsume Environment
+            | HolePair Code Environment 
+            | PairHole Code Environment
             deriving (Show)
 
 data ListContents = Empty | Next Code ListContents deriving (Eq, Show)
@@ -134,6 +139,7 @@ isValue (Location _) = True
 isValue (Closure _ _ _) = True
 isValue (Unit) = True
 isValue (List _) = True
+isValue (Pair p q) = (isValue p) && (isValue q)
 isValue _ = False
 
 inject :: Code -> State
@@ -283,6 +289,15 @@ step (w,env1,store,(AppHole (Closure x e env2) ) : k, buffer ) | isValue w  = re
 -- Performed full evaluation, but kontinuation contains old global bindings
 step (v, env2, store, (Global env):kontinuation, buffer) = return (v, env, store, kontinuation, buffer)
 
+
+-- Evaluation rules for pairs
+step ((Pair e1 e2),env, store, kontinuation, buffer) = return (e1,env,store, (HolePair e2 env):kontinuation,buffer)
+
+step (v,env1,store, (HolePair e env2):kontinuation, buffer) | isValue v = return (e,env2,store, (PairHole v env1) : kontinuation, buffer)
+
+step (w,env,store, (PairHole v env2):kontinuation, buffer) | isValue w = return ( (Pair v w),env2,store,kontinuation,buffer)
+
+
 -- For terminal states, evaluated to value, no continuation, just return itself
 step state@(v, _, _, [], _) | isValue v = return state
 
@@ -321,6 +336,8 @@ evalUnary Tail (List (Next h tail)) = List tail
 evalUnary Tail (List Empty) = (Exception ListEmptyException)
 evalUnary ListIsEmpty (List Empty) = (Boolean True)
 evalUnary ListIsEmpty (List _) = (Boolean False)
+evalUnary FstOp (Pair p _) = p
+evalUnary SndOp (Pair _ q) = q
 
 
 evalUnary _ _ = errorWithoutStackTrace "not valid"
@@ -334,7 +351,15 @@ valueToString (Boolean False) = "False"
 valueToString (List (Empty)) = ""
 valueToString (Character c) = [c]
 valueToString (List (Next (Character c) cs)) = ([c])++(valueToString (List cs))
+valueToString (List contents ) = "[" ++ (foldr (\a -> \b -> if b =="" then (valueToString a) else ((valueToString a) ++ "," ++ b))  "" (convertList contents)) ++ "]"
+valueToString (Closure _ _ _) = "(closure)"
+valueToString (Unit) = "()"
+valueToString (Pair p q) = "("++(valueToString p)++","++(valueToString q)++")"
 valueToString _ = errorWithoutStackTrace "inpossible to print"
+
+convertList :: ListContents -> [Code]
+convertList (Empty) = []
+convertList (Next a b) = a:convertList b
 
 -- Is it a terminals state
 isTerminal :: State -> Bool
@@ -448,3 +473,6 @@ convert (IsEmptyOp v) = (UnaryOp ListIsEmpty (convert v))
 convert (LamExpr _ var expr) = (Lam var (convert expr))
 convert (Application lhs rhs) = (App (convert lhs) (convert rhs))
 convert (ReturnOp v) = (convert v)
+convert (PairVal p q) = (Pair (convert p) (convert q))
+convert (First p) = (UnaryOp FstOp (convert p))
+convert (Second q) = (UnaryOp SndOp (convert q))

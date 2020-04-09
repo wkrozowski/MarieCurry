@@ -24,14 +24,29 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     isCorrectType (ArrowT l r) = (isCorrectType l) && (isCorrectType r)
     isCorrectType (UnitT) = True
     isCorrectType (ListT t) = isCorrectType t
+    isCorrectType (PairT s t) = isCorrectType s && isCorrectType t
     isCorrectType (EmptyListT) = True
 
     isList :: Type -> Bool
     isList (ListT t) = True
     isList _ = False
 
+    isPair :: Type -> Bool
+    isPair (PairT p q) = True
+    isPair _ = False
+
     envLookup :: String -> Gamma -> Maybe Type
     envLookup varName env = pure snd <*> (find (\x-> fst x == varName) env)
+
+    compareTypes :: Type -> Type -> Bool
+    compareTypes p q
+        | p == q = True
+    compareTypes EmptyListT (ListT _) = True
+    compareTypes (ListT _) (EmptyListT) = True
+    compareTypes (ListT p) (ListT q) = (compareTypes p q)
+    compareTypes (PairT p q) (PairT r s) = (compareTypes p r) && (compareTypes q s)
+    compareTypes (ArrowT p q) (ArrowT r s) = (compareTypes p r) && (compareTypes q s)
+    compareTypes _ _ = False
 
     check :: Stmt -> Gamma -> Type
     check (BoolVal _) _ = BoolT
@@ -39,6 +54,8 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     check (NumVal _) _ = IntT
 
     check (StringVal _) _ = ListT CharT
+
+    check (PairVal lhs rhs) env = PairT (check lhs env) (check rhs env) 
 
     check (Variable name) env = case envLookup name env of
             Just n -> n
@@ -69,9 +86,9 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | otherwise = throw (TypeException "Type error in while expression")
 
     check (AssignmentStmt name val) env
-        | check (Variable name) env == check val env = VoidT
+        | compareTypes (check (Variable name) env) ( check val env) = VoidT
         | isList (check (Variable name) env) && (check val env == EmptyListT) = VoidT
-        | otherwise = throw (TypeException "Type mismatch while assigning value to variable")
+        | otherwise = throw (TypeException ("Type mismatch while assigning value to variable: " ++ show (check (Variable name) env) ++ " !=" ++ show (check val env)) )
 
     check (IfStmt cond branch) env
         | check cond env == BoolT = check branch env
@@ -86,11 +103,7 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | otherwise = throw (TypeException "Branches of if-then-else expression have not matching types")
 
     check (PrintOp v) env
-        | (check v env) == IntT = VoidT
-        | (check v env) == BoolT = VoidT
-        | (check v env) == ListT CharT = VoidT
-        | (check v env) == CharT = VoidT
-        | otherwise = throw (TypeException "Trying to print a type which is not printable")
+        | isCorrectType (check v env) = VoidT
 
     check (ThrowStmt _) env = VoidT
 
@@ -224,5 +237,13 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | ListT (check lhs env) == (check rhs env) = (check rhs env)
         | isCorrectType (check lhs env) && (check rhs env)== EmptyListT = ListT (check lhs env)
         | otherwise = throw (TypeException "Type error in list constructor")
+
+    check (First x) env
+     | isPair (check x env) = let (PairT t1 t2)=(check x env) in t1
+     | otherwise = throw (TypeException "Taking fst of a value which is not a tuple")
+
+    check (Second x) env
+     | isPair (check x env) = let (PairT t1 t2)=(check x env) in t1
+     | otherwise = throw (TypeException "Taking snd of a value which is not a tuple")
 
     check _ env = throw (TypeException "type error")
