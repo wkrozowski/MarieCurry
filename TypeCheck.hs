@@ -48,10 +48,22 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
     compareTypes (ArrowT p q) (ArrowT r s) = (compareTypes p r) && (compareTypes q s)
     compareTypes _ _ = False
 
+    canBeCompared :: Type -> Bool
+    canBeCompared UnitT = True
+    canBeCompared IntT = True
+    canBeCompared CharT = True
+    canBeCompared VoidT = True
+    canBeCompared (ArrowT _ _) = False
+    canBeCompared EmptyListT = True
+    canBeCompared (PairT p q) = canBeCompared p && canBeCompared q
+    canBeCompared (ListT p) = canBeCompared p
+
     check :: Stmt -> Gamma -> Type
     check (BoolVal _) _ = BoolT
 
     check (NumVal _) _ = IntT
+
+    check (CharVal _) _ = CharT
 
     check (StringVal _) _ = ListT CharT
 
@@ -167,14 +179,11 @@ module TypeCheck(Identifier, Gamma, check, Stmt) where
         | otherwise = throw (TypeException "Both sides of division have wrong types")
 
     check (EqualOp  lhs rhs) env
-        | check lhs env == IntT && check rhs env == IntT = BoolT
-        | check lhs env == BoolT && check rhs env == BoolT = BoolT
-        | check lhs env == StringT && check rhs env == StringT = BoolT
+        | (canBeCompared (check lhs env)) && (canBeCompared (check rhs env)) && (compareTypes (check lhs env) (check rhs env)) = BoolT
         | otherwise = throw (TypeException "Type mismatch in comparision operator")
 
     check (NotEqualOp  lhs rhs) env
-        | check lhs env == IntT && check rhs env == IntT = BoolT
-        | check lhs env == BoolT && check rhs env == BoolT = BoolT
+        | (canBeCompared (check lhs env)) && (canBeCompared (check rhs env)) && (compareTypes (check lhs env) (check rhs env)) = BoolT   
         | otherwise = throw (TypeException "Type mismatch in not-equals operator")
 
     check (OrOp  lhs rhs) env

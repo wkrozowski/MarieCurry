@@ -67,6 +67,7 @@ import SyntaxCheck
       DivideByZeroException                 { MkToken _ TokenDBZE}
       TrapException                         { MkToken _ TokenTE}
       ListEmptyException                    { MkToken _ TokenLEE}
+      character                             { MkToken _ (TokenChar $$)}
 
 
 %nonassoc '<' '>' '>=' '<=' '==' '!='
@@ -139,6 +140,7 @@ Exp2 : '(' Expression ')'                                                  {$2}
      | var                                                                {Variable $1}
      | bool                                                               {BoolVal $1}
      | number                                                             {NumVal $1}
+     | character                                                          {CharVal $1}
      | '(' Expression ',' Expression ')'                                  {PairVal $2 $4}
      | '[' ']'                                                            {EmptyListVal}
 
@@ -205,6 +207,7 @@ data Stmt =      Include String
                | PairVal Stmt Stmt
                | First Stmt
                | Second Stmt
+               | CharVal Char
                deriving (Show)
 
 data ExceptionType = NullPointer
