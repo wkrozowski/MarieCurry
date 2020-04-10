@@ -61,7 +61,6 @@ data Code =   Null
             | Exception ExceptionCodeType
             | Number Int
             | Boolean Bool
-            | String String
             | Character Char
             | Location Address
             | Reference String
@@ -316,9 +315,18 @@ evalBinop LessThan (Number m) (Number n) = (Boolean (m<n))
 evalBinop LessOrEqual (Number m) (Number n) = (Boolean (m<=n))
 evalBinop Equal (Number m) (Number n) = (Boolean (m==n))
 evalBinop Equal (Boolean m) (Boolean n) = (Boolean (m==n))
-evalBinop Equal (String m) (String n) = (Boolean (m==n))
+evalBinop Equal (Character m) (Character n) = (Boolean (m==n))
+evalBinop Equal (Unit) (Unit) = (Boolean True)
+evalBinop Equal (List a) (List b) = Boolean (compareLists a b)
+evalBinop Equal (Pair a b) (Pair c d) = evalBinop LogicalAnd (evalBinop Equal a c) (evalBinop Equal b d)
+evalBinop Equal (Void) (Void) = (Boolean True)
 evalBinop NotEqual (Number m) (Number n) = (Boolean (m/=n))
 evalBinop NotEqual (Boolean m) (Boolean n) = (Boolean (m/=n))
+evalBinop NotEqual (Character m) (Character n) = (Boolean (m/=n))
+evalBinop NotEqual (Unit) (Unit) = (Boolean False)
+evalBinop NotEqual (List a) (List b) = Boolean (not (compareLists a b))
+evalBinop NotEqual lhs@(Pair a b) rhs@(Pair c d) = evalUnary LogicalNot (evalBinop Equal lhs rhs)
+evalBinop NotEqual (Void) (Void) = (Boolean False)
 evalBinop GreaterOrEqual (Number m) (Number n) = (Boolean (m>=n))
 evalBinop GreaterThan (Number m) (Number n) = (Boolean (m>n))
 evalBinop LogicalAnd (Boolean m) (Boolean n) = (Boolean (m && n))
@@ -326,6 +334,14 @@ evalBinop LogicalOr (Boolean m) (Boolean n) = (Boolean (m || n))
 evalBinop LogicalXor (Boolean m) (Boolean n) = (Boolean (xor m n))
 evalBinop ListCons (v) (List contents) | isValue v = List (Next v contents)
 evalBinop a b c = errorWithoutStackTrace ("not valid operation: " ++ (show a) ++ " called with arguments: " ++ (show b) ++ " and " ++ (show c))
+
+compareLists :: ListContents -> ListContents -> Bool
+compareLists Empty Empty = True
+compareLists Empty (Next _ _) = False
+compareLists (Next _ _) Empty = False
+compareLists (Next v1 n1) (Next v2 n2) = case evalBinop Equal v1 v2 of
+    Boolean True -> (compareLists n1 n2)
+    otherwise -> False
 
 evalUnary :: UnaryOpType -> Code -> Code
 evalUnary LogicalNot (Boolean m) = (Boolean (not m))
@@ -345,7 +361,6 @@ evalUnary _ _ = errorWithoutStackTrace "not valid"
 -- Allows printing values to output stream
 valueToString :: Code -> String
 valueToString (Number n) = show n
-valueToString (String n) = n
 valueToString (Boolean True) = "True"
 valueToString (Boolean False) = "False"
 valueToString (List (Empty)) = ""
@@ -476,3 +491,4 @@ convert (ReturnOp v) = (convert v)
 convert (PairVal p q) = (Pair (convert p) (convert q))
 convert (First p) = (UnaryOp FstOp (convert p))
 convert (Second q) = (UnaryOp SndOp (convert q))
+convert (CharVal c) = (Character c)

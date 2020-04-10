@@ -88,6 +88,7 @@ tokens :-
   ListEmptyException                      {\p s -> MkToken p TokenLEE}
   $alpha [$alpha $digit \_ \’]*           {\p s -> MkToken p (TokenVar s)}
   \" @string* \"		                      {\p s -> MkToken p (TokenString $ trimString s) }
+  \' $graphic \'                          {\p s -> MkToken p (TokenChar (s!!1))}
 
 {
 
@@ -153,7 +154,8 @@ data TokenClass =
   TokenComma                  |
   TokenFst                    |
   TokenSnd                    |
-  TokenInclude
+  TokenInclude                |
+  TokenChar Char
     deriving (Show,Eq)
 
 trimString :: String -> String
