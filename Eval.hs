@@ -10,6 +10,8 @@ import qualified Data.Map as Map
 import Data.List
 import System.IO (isEOF, hPutStrLn, stderr)
 import Data.Bits(xor)
+import Control.Monad
+import Debug.Trace
 import MCParser
 import MCLexer
 
@@ -108,25 +110,54 @@ type Kontinuation = [Frame]
 type State = (Code, Environment, Store, Kontinuation, Buffer)
 
 collectEnvs :: Kontinuation -> [Environment]
-collectEnvs ((Branch _ _ e):kont) = e:(collectEnvs kont)
-collectEnvs ((Then _ e):kont) = e:(collectEnvs kont)
-collectEnvs ((EvalRight _ _ e):kont) = e:(collectEnvs kont)
-collectEnvs ((EvalOp _ _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((Branch p q e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)++(unwrapEnvFromCode q)
+collectEnvs ((Then p e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
+collectEnvs ((EvalRight _ p e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
+collectEnvs ((EvalOp _ p e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
 collectEnvs ((Assign _ e):kont) = e:(collectEnvs kont)
 collectEnvs ((EvalPrint e):kont) = e:(collectEnvs kont)
-collectEnvs ((ExceptionHandler _ _ e):kont) = e:(collectEnvs kont)
+collectEnvs ((ExceptionHandler _ p e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
 collectEnvs ((EvalUnaryOp _ e):kont) = e:(collectEnvs kont)
-collectEnvs ((HoleApp _ e ):kont) = e:(collectEnvs kont)
+collectEnvs ((HoleApp p e ):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
+collectEnvs ((AppHole p):kont) = (unwrapEnvFromCode p)++(collectEnvs kont)
 collectEnvs ((Global e):kont) = e:(collectEnvs kont)
-collectEnvs (_:kont) = (collectEnvs kont)
-collectEnvs _ = []
+collectEnvs ((EvalConsume e):kont) = e:(collectEnvs kont)
+collectEnvs ((HolePair p e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
+collectEnvs ((PairHole p e):kont) = e:(collectEnvs kont) ++ (unwrapEnvFromCode p)
 
-usedReferences :: Kontinuation -> [Int]
-usedReferences kontinuation = foldl (union) [] $ map (Map.elems) (collectEnvs kontinuation)
+collectEnvs [] = []
+
+getClosureEnvironment :: Code -> Environment
+getClosureEnvironment (Closure _ _ env) = env
+getClosureEnvironment _ = Map.empty
+
+getAllClosureEnvs :: Store -> [Environment]
+getAllClosureEnvs store = map getClosureEnvironment (Map.elems store) 
+
+envToRef :: [Environment] -> [Int]
+envToRef envs = (foldl (union) [] $ map (Map.elems) envs)
+
+usedReferences :: Kontinuation -> Store -> [Int]    
+usedReferences kontinuation store = envToRef (collectEnvs kontinuation `union` getAllClosureEnvs store)
+
+unwrapEnvFromCode :: Code -> [Environment]
+unwrapEnvFromCode (Closure _ c e) = e:(unwrapEnvFromCode c)
+unwrapEnvFromCode (Statement p q) = (unwrapEnvFromCode p) ++ (unwrapEnvFromCode q)
+unwrapEnvFromCode (While p q) = (unwrapEnvFromCode p) ++ (unwrapEnvFromCode q)
+unwrapEnvFromCode (If p q r) = (unwrapEnvFromCode p) ++ (unwrapEnvFromCode q) ++ (unwrapEnvFromCode r)
+unwrapEnvFromCode (Assignment _ p) = (unwrapEnvFromCode p) 
+unwrapEnvFromCode (Consume p ) = (unwrapEnvFromCode p) 
+unwrapEnvFromCode (Print p) = (unwrapEnvFromCode p) 
+unwrapEnvFromCode (TryCatch _ p q) = (unwrapEnvFromCode p) ++ (unwrapEnvFromCode q)
+unwrapEnvFromCode (BinOp _ p q) = (unwrapEnvFromCode p) ++ (unwrapEnvFromCode q)
+unwrapEnvFromCode (UnaryOp _ p)= (unwrapEnvFromCode p)
+unwrapEnvFromCode (Lam _ p) = (unwrapEnvFromCode p)
+unwrapEnvFromCode _ = []
 
 garbageCollect :: Environment -> Store -> Kontinuation -> Store
 garbageCollect env store kont = Map.filterWithKey (\k _ -> elem k used) store where
-    used = usedReferences kont ++ Map.elems env
+    used = (usedReferences kont store) `union` Map.elems env
+
 
 -- If it is terminal value of the language - return true
 isValue :: Code -> Bool
@@ -137,9 +168,13 @@ isValue (Character _) = True
 isValue (Location _) = True
 isValue (Closure _ _ _) = True
 isValue (Unit) = True
-isValue (List _) = True
+isValue (List c) = isEvaluatedList c
 isValue (Pair p q) = (isValue p) && (isValue q)
 isValue _ = False
+
+isEvaluatedList :: ListContents -> Bool
+isEvaluatedList Empty = True
+isEvaluatedList (Next val cont) = (isValue val) && (isEvaluatedList cont)
 
 inject :: Code -> State
 inject code = (code, Map.empty, Map.empty, [], [])
@@ -157,8 +192,8 @@ step ((Statement (Definition name) e2), env, store, kontinuation, buffer) = retu
 step ((Statement e1 e2), env, store, kontinuation, buffer) = return (e1, env, store, (Then e2 env):kontinuation, buffer)
 
 -- If e1 has terminated, then restore environment and execute e2
-step (v, env1, store, (Then e2 env2):kontinuation, buffer)
-    | isValue v =  return (e2, env2, (garbageCollect env2 store kontinuation), kontinuation, buffer)
+step s@(v, env1, store, (Then e2 env2):kontinuation, buffer)
+    | isValue v = return (e2, env2, (garbageCollect env2 store ((Then e2 env2):kontinuation)), kontinuation, buffer)
 
 -- When executing If statement - save the environment and both branches in the continuation and evaluate the condition first
 step ((If cond lhs rhs), env, store, kontinuation, buffer) = return (cond, env, store, (Branch lhs rhs env):kontinuation, buffer)
@@ -175,7 +210,7 @@ step (whileExp@(While condition exp), env, store, kontinuation, buffer) = return
 
 -- Lookup location of a reference type
 step(Reference variableName, env, store, kontinuation, buffer)
-    | lookupResult == Nothing = errorWithoutStackTrace "Dereferencing not existent variable"
+    | lookupResult == Nothing = errorWithoutStackTrace ("Dereferencing not existent variable, on variable name: "++ (show variableName)++ " " ++ (show $ head $ kontinuation))
     | otherwise = let (Just v)=lookupResult in
         return (v, env, store, kontinuation, buffer)
     where lookupResult = (Map.lookup variableName env)>>= (\x -> Map.lookup x store)

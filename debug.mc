@@ -61,6 +61,7 @@ quicksort = \([int] list) -> {
 			rhs =  (filterInt (rest) (greaterOrEqual pivot));
 			[int] lhs;
 			lhs =  (filterInt (rest) (smaller pivot));
+                        [int] test;
 			retVal = concatInt (concatInt (quicksort lhs) (pivot cons [])) (quicksort rhs);	
 		}
 
@@ -68,77 +69,13 @@ quicksort = \([int] list) -> {
 	}
 };
 
-
-
-[int]->(int->int)->[int] mapInt;
-mapInt = \([int] list) -> {
-	\(int->int fun) -> {
-		if(isEmpty list) {
-			return [];
-		}
-		else {
-			return (fun (head list)) cons (mapInt (tail list) fun);
-		}
-	};
-};
-
-[int] -> (int -> ()) -> () forEachInt;
-forEachInt = \([int] list) -> {
-	\(int->() fun) -> {
-		if (isEmpty list) {
-			return ();
-		}
-		else {
-			fun (head list);
-			return forEachInt (tail list) fun;
-		}
-	};
-}; 
-
-[char] -> (char -> ()) -> () forEachChar;
-forEachChar = \([char] list) -> {
-	\(char->() fun) -> {
-		if (isEmpty list) {
-			return ();
-		}
-		else {
-			fun (head list);
-			return forEachChar (tail list) fun;
-		}
-	};
-}; 
-
-int -> () printInt;
-printInt = \(int x) -> {
-	print x;
-	return ();
-};
-
-char -> () printChar;
-printChar = \(char x) -> {
-	print x;
-	return ();
-};
-
-[char] -> [char] -> [char] concat;
-concat = \([char] lhs) -> {
-	\([char] rhs) -> {
-		if (isEmpty lhs) {
-			return rhs;
-		} else {
-			return ((head lhs) cons (concat (tail lhs) rhs));
-		}
-	};
-};
-
-[int] -> [int] -> [(int,int)] zip;
-zip = \([int] list1) -> {
-    \([int] list2) -> {
-        if((isEmpty list1) || (isEmpty list2)) {
-            return [];
-        }
-        else {
-            return (head list1, head list2) cons (zip (tail list1) (tail list2));
-        }
-    };
-};
+[int] myList;
+myList = 1 cons [];
+int x;
+x = 0;
+while (x < 1)
+{
+        myList = x cons myList;
+        x = x + 1;
+}
+print quicksort myList;
