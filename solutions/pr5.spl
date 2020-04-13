@@ -1,6 +1,5 @@
 streams 1;
-int ax;
-ax = 0;
+int ax = 0;
 while (true)
 {
   ax = ax + (consume 0);

@@ -23,7 +23,7 @@ module Preprocesor(runPreprocesor) where
     loadFile :: String -> IO (Stmt)
     loadFile path = do
         contents <- readFile path
-        return (parse $ checkSyntax (alexScanTokens contents) [])
+        return (modParse $ checkSyntax (alexScanTokens contents) [])
 
     runPreprocesor :: String -> IO(Stmt)
     runPreprocesor path = loadFile path >>= process

@@ -96,11 +96,13 @@ Expression : Operation                      {$1}
            | var '=' Expression             {AssignmentStmt $1 $3}
            | var '=' unit                   {AssignmentStmt $1 UnitVal}
            | Type var                       {Declaration $1 $2}
+           | Type var '=' Expression        {Stmt (Declaration $1 $2) (AssignmentStmt $2 $4)}
+           | Type var '=' unit              {Stmt (Declaration $1 $2) (AssignmentStmt $2 UnitVal)}
            | print Expression               {PrintOp $2}
            | consume Expression             {ConsumeStream $2}
            | streams Expression             {Streams $2}
            | fst Expression                 {First $2}
-           | snd Expression              {Second $2}
+           | snd Expression                 {Second $2}
            | return Expression              {ReturnOp $2}
            | return unit                    {ReturnOp UnitVal}
            | throw Exception                {ThrowStmt $2}
@@ -127,7 +129,7 @@ Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | '!' Operation  %prec UNARY   {NotOp $2}
                | tail Operation %prec UNARY   {TailOp $2}
                | head Operation %prec UNARY   {HeadOp $2}
-               | isEmpty Operation %prec UNARY {IsEmptyOp $2}
+               | isEmpty Operation %prec UNARY{IsEmptyOp $2}
                | Exp1                         {$1}
 
 Exp1           : Exp1 Exp2                    {Application $1 $2}
@@ -243,4 +245,14 @@ parseErrorMessage li col =  "Error parsing around line: " ++ (show li) ++ " colu
 guessCauseOfError :: [TokenClass] -> String
 guessCauseOfError (TokenLCurly : tks) = "You have probably forgotten ')' or '->'"
 guessCauseOfError _ = "You might have forgotten ';' in the previous statement"
+
+modParse :: [Token] -> Stmt
+modParse tks = modParse' parsedTks
+     where
+          parsedTks = parse tks
+
+modParse' :: Stmt -> Stmt
+modParse' (Stmt (Stmt decl@(Declaration varType varName)assign@(AssignmentStmt name val)) rest ) = Stmt (decl) (Stmt (assign) (modParse' rest))
+modParse' (Stmt e1 e2) = Stmt (modParse' e1) (modParse' e2)
+modParse' x = x
 }
