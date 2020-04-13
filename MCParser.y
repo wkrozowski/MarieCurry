@@ -81,14 +81,18 @@ Stmt : Expression ';' Stmt         {Stmt $1 $3}
           | Expression ';'                   {$1}
           | Selection_Stmt Stmt    {Stmt $1 $2}
           | Iteration_Stmt Stmt    {Stmt $1 $2}
+          | Function_Stmt Stmt     {Stmt $1 $2}
           | Selection_Stmt              {$1}
           | Iteration_Stmt              {$1}
+          | Function_Stmt               {$1}
 
 Selection_Stmt:      if '(' Expression ')' Compound_Stmt else Compound_Stmt  {IfStmtElse $3 $5 $7}
                    | if '(' Expression ')' Compound_Stmt                          {IfStmt $3 $5}
                    | try Compound_Stmt catch '(' Exception ')' Compound_Stmt {TryCatchStmt $2 $5 $7}
 
 Iteration_Stmt: while '(' Expression ')' Compound_Stmt {WhileStmt $3 $5}
+
+Function_Stmt : Type var '(' FuncParams ')' Compound_Stmt {FuncDef $1 $2 $4 $6}
 
 Compound_Stmt: '{' Stmt '}' {$2}
 
@@ -110,6 +114,8 @@ Expression : Operation                      {$1}
            | lambda unit '->' Compound_Stmt {LamExpr UnitT "()" $4}
            | include string                  {Include $2}
 
+FuncParams : Type var ',' FuncParams {Stmt (Declaration $1 $2) $4}
+           | Type var                {Declaration $1 $2}
 
 Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | Operation '-'  Operation     {SubtractOp $1 $3}
@@ -172,6 +178,7 @@ data Stmt =      Include String
                | IfStmt Stmt Stmt
                | WhileStmt Stmt Stmt
                | AssignmentStmt String Stmt
+               | FuncDef Type String Stmt Stmt
                | Declaration Type String
                | PrintOp Stmt
                | BoolVal Bool
@@ -252,7 +259,21 @@ modParse tks = modParse' parsedTks
           parsedTks = parse tks
 
 modParse' :: Stmt -> Stmt
-modParse' (Stmt (Stmt decl@(Declaration varType varName)assign@(AssignmentStmt name val)) rest ) = Stmt (decl) (Stmt (assign) (modParse' rest))
-modParse' (Stmt e1 e2) = Stmt (modParse' e1) (modParse' e2)
+modParse' (Stmt (Stmt decl@(Declaration varType varName)assign@(AssignmentStmt name val)) rest ) = 
+     (Stmt (decl) (Stmt (assign) (modParse' rest)))
+modParse' (Stmt (FuncDef rtype fname boundVars funBody) rest)= 
+      (Stmt (Declaration (genFunType boundVars rtype ) fname ) (Stmt (AssignmentStmt fname (genLamFunc boundVars funBody))
+     (modParse' rest)))
+modParse' (Stmt e1 e2) = (Stmt (modParse' e1) (modParse' e2))
 modParse' x = x
+
+genFunType :: Stmt -> Type -> Type
+genFunType (Stmt (Declaration varType _) otherVars) returnType =
+      (ArrowT varType (genFunType otherVars returnType))
+genFunType (Declaration varType _) returnType = ArrowT varType returnType
+
+genLamFunc :: Stmt -> Stmt -> Stmt
+genLamFunc (Stmt (Declaration varType varName) otherVars) funBody =
+     (LamExpr varType varName (genLamFunc otherVars funBody))
+genLamFunc (Declaration varType varName) funBody = (LamExpr varType varName funBody)
 }
