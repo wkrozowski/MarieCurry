@@ -1,2 +1,0 @@
-[char] t;
-t = "filemc";
