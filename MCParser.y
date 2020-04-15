@@ -264,6 +264,7 @@ modParse' (Stmt (Stmt decl@(Declaration varType varName)assign@(AssignmentStmt n
 modParse' (Stmt (FuncDef rtype fname boundVars funBody) rest)= 
       (Stmt (Declaration (genFunType boundVars rtype ) fname ) (Stmt (AssignmentStmt fname (genLamFunc boundVars funBody))
      (modParse' rest)))
+modParse' (FuncDef rtype fname boundVars funBody) = (Stmt (Declaration (genFunType boundVars rtype ) fname ) ((AssignmentStmt fname (genLamFunc boundVars funBody))))
 modParse' (Stmt e1 e2) = (Stmt (modParse' e1) (modParse' e2))
 modParse' x = x
 
