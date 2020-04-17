@@ -93,6 +93,7 @@ Selection_Stmt:      if '(' Expression ')' Compound_Stmt else Compound_Stmt  {If
 Iteration_Stmt: while '(' Expression ')' Compound_Stmt {WhileStmt $3 $5}
 
 Function_Stmt : Type var '(' FuncParams ')' Compound_Stmt {FuncDef $1 $2 $4 $6}
+              | Type var unit Compound_Stmt               {FuncDef $1 $2 (Declaration UnitT "()") $4}
 
 Compound_Stmt: '{' Stmt '}' {$2}
 
@@ -115,7 +116,9 @@ Expression : Operation                      {$1}
            | include string                  {Include $2}
 
 FuncParams : Type var ',' FuncParams {Stmt (Declaration $1 $2) $4}
+           | unit ',' FuncParams     {Stmt (Declaration UnitT "()") $3}
            | Type var                {Declaration $1 $2}
+           | unit                    {Declaration UnitT "()"}
 
 Operation      : Operation '+'  Operation     {AddOp $1 $3}
                | Operation '-'  Operation     {SubtractOp $1 $3}
