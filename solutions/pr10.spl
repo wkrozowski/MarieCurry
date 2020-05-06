@@ -1,0 +1,74 @@
+-- returns size of list
+int sizeof ([int] list)
+{
+    int length;
+    length = 0;
+    while(!(isEmpty list))
+    {
+        length = length + 1;
+        list = tail list;
+    }
+    return length;
+
+}
+
+-- returns the element of the list at the given index
+-- throws EmptyListException if index given is out of bounds
+int get ([int] list, int index)
+{
+    while (index > 0)
+    {
+        list = tail list;
+        index = index - 1;
+    }
+
+    return (head list);
+}
+
+
+
+streams 1;
+
+[int] fib;
+-- base of the fibonacci sequence
+fib = 1 cons ( 1 cons []);
+
+[int] as;
+int a1;
+int a2;
+
+a1 = consume 0;
+
+-- printing before consuming second value so that it doesn't hang on a one value stream
+print a1;
+
+a2 = consume 0;
+-- base case of our stream sequence
+as =  a2 cons (a1 cons []);
+
+
+while(true)
+{
+
+    [int] tempFib;
+    tempFib = fib;
+
+    int result;
+    result = 0;
+    int i; i = 0;
+
+    -- main loop which builds up result
+    while((sizeof as) - i > 0)
+    {
+        result = result + (head tempFib) * (get as ((sizeof as) - i - 1));
+        tempFib = tail tempFib;
+        i = i + 1;
+    }
+    print result;
+
+    -- updating lists 
+    as = (consume 0) cons as;
+    fib = ((head fib) + (head (tail fib))) cons fib;
+}
+
+

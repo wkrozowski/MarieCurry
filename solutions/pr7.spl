@@ -1,0 +1,24 @@
+streams 1;
+int i = 0;
+while(true)
+{
+    i = i % 2;
+    if(i == 0)
+    {
+         consume 0;
+         consume 0;
+
+         int out; out = consume 0;
+         print out;
+    }
+    else
+    {
+        consume 0;
+        consume 0;
+        consume 0;
+        
+        int out; out = consume 0;
+        print out;
+    }
+    i = i + 1;
+}

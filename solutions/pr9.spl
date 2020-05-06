@@ -1,0 +1,9 @@
+streams 1;
+int i = 1;
+while(true)
+{
+    int ai; ai = consume 0;
+    print ai;
+    print i;
+    i = i + 1;
+}
