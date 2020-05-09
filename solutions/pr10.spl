@@ -50,11 +50,8 @@ as =  a2 cons (a1 cons []);
 while(true)
 {
 
-    [int] tempFib;
-    tempFib = fib;
-
-    int result;
-    result = 0;
+    [int] tempFib; tempFib = fib;
+    int result; result = 0;
     int i; i = 0;
 
     -- main loop which builds up result
