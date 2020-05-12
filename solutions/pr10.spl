@@ -1,3 +1,59 @@
+streams 1;
+
+-- Helper functions from standard library
+[int] -> [int] -> [(int,int)] zip;
+zip = \([int] list1) -> {
+    \([int] list2) -> {
+        if((isEmpty list1) || (isEmpty list2)) {
+            return [];
+        }
+        else {
+            return (head list1, head list2) cons (zip (tail list1) (tail list2));
+        }
+    };
+};
+
+[int] -> int -> [int] append;
+append = \([int] list) -> {
+    \(int element) -> {
+        [int] retVal;
+        if (isEmpty list) {
+            retVal =  element cons [];
+        } else {
+            retVal = (head list) cons (append (tail list) element);
+        }
+        return retVal;
+    };
+};
+
+[(int,int)]->((int,int)->int)->[int] map;
+map = \([(int,int)] list) -> {
+	\((int,int)->int fun) -> {
+		if(isEmpty list) {
+			return [];
+		}
+		else {
+			return (fun (head list)) cons (map (tail list) fun);
+		}
+	};
+};
+
+(int,int)-> int multiplyTuple;
+multiplyTuple = \((int, int) pair) -> {
+    return (fst pair) * (snd pair);
+};
+
+[int] -> int sum;
+sum = \([int] ls) -> {
+    int retVal;
+    if (isEmpty ls) {
+        retVal = 0;
+    } else {
+        retVal = (head ls) + sum (tail ls);
+    }
+    return retVal;
+};
+
 -- returns size of list
 int sizeof ([int] list)
 {
@@ -9,66 +65,29 @@ int sizeof ([int] list)
         list = tail list;
     }
     return length;
-
 }
 
--- returns the element of the list at the given index
--- throws EmptyListException if index given is out of bounds
-int get ([int] list, int index)
-{
-    while (index > 0)
-    {
-        list = tail list;
-        index = index - 1;
+[int] fibonacci = 1 cons (1 cons []);
+int a0 = 1;
+int a1 = 1;
+
+int counter = 1;
+[int] input = [];
+while(true) {
+    -- generate new fibonacci number
+    if((sizeof fibonacci) < counter ) {
+        int tmp;
+        tmp = a1;
+        a1 = a1 + a0;
+        a0 = tmp;
+        fibonacci = a1 cons fibonacci;
     }
 
-    return (head list);
+    -- get new number from the input
+    input = append input (consume 0);
+
+    -- pair the fibonacci numbers as coefficients with all the numbers from input
+    print sum (map (zip (fibonacci) input) multiplyTuple);
+
+    counter = counter + 1;
 }
-
-
-
-streams 1;
-
-[int] fib;
--- base of the fibonacci sequence
-fib = 1 cons ( 1 cons []);
-
-[int] as;
-int a1;
-int a2;
-
-a1 = consume 0;
-
--- printing before consuming second value so that it doesn't hang on a one value stream
-print a1;
-
-a2 = consume 0;
--- base case of our stream sequence
-as =  a2 cons (a1 cons []);
-
-
-while(true)
-{
-
-    [int] tempFib;
-    tempFib = fib;
-
-    int result;
-    result = 0;
-    int i; i = 0;
-
-    -- main loop which builds up result
-    while((sizeof as) - i > 0)
-    {
-        result = result + (head tempFib) * (get as ((sizeof as) - i - 1));
-        tempFib = tail tempFib;
-        i = i + 1;
-    }
-    print result;
-
-    -- updating lists 
-    as = (consume 0) cons as;
-    fib = ((head fib) + (head (tail fib))) cons fib;
-}
-
-

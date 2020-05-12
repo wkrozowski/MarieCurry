@@ -1,42 +1,81 @@
 streams 2;
-int i = 0;
-while(true)
-{
-    i = i % 5;
-    if (i == 0)
-    {
-        int a1; a1 = consume 0;
-        print a1;
 
-        int b1; b1 = consume 1;
-        print b1;
+-- Helper functions from standard library
+[int] -> [int] -> [(int,int)] zip;
+zip = \([int] list1) -> {
+    \([int] list2) -> {
+        if((isEmpty list1) || (isEmpty list2)) {
+            return [];
+        }
+        else {
+            return (head list1, head list2) cons (zip (tail list1) (tail list2));
+        }
+    };
+};
 
-        int a2; a2 = consume 0;
-        print a2;
+[(int,int)]->((int,int)->int)->[int] map;
+map = \([(int,int)] list) -> {
+	\((int,int)->int fun) -> {
+		if(isEmpty list) {
+			return [];
+		}
+		else {
+			return (fun (head list)) cons (map (tail list) fun);
+		}
+	};
+};
 
-        int b2; b2 = consume 1;
-        print b2;
+(int, int) -> int subtractTuple;
+subtractTuple = \((int,int) x) -> {
+    return (fst x) - (snd x);
+};
 
-        int a3; a3 = consume 0;
-        print a3;
+[int] -> int -> [int] append;
+append = \([int] list) -> {
+    \(int element) -> {
+        [int] retVal;
+        if (isEmpty list) {
+            retVal =  element cons [];
+        } else {
+            retVal = (head list) cons (append (tail list) element);
+        }
+        return retVal;
+    };
+};
 
-        int b3; b3 = consume 1;
-        print b3;
-
-        int a4; a4 = consume 0;
-        print a4;
-
-        int b4; b4 = consume 1;
-        print b4;
-
-        int a5; a5 = consume 0;
-        print a5;
-        
-        int b5; b5 = consume 1;
-        print b5;
-
-        print (a1 - b1 + a2 - b2 + a3 - b3 + a4 - b4 + a5 - b5 );
-
+[int] -> int sum;
+sum = \([int] ls) -> {
+    int retVal;
+    if (isEmpty ls) {
+        retVal = 0;
+    } else {
+        retVal = (head ls) + sum (tail ls);
     }
-    i = i + 1;
+    return retVal;
+};
+
+-- Code begins here
+
+[int] list1 = [];
+[int] list2 = [];
+[(int, int)] zippedList;
+
+while(true) {
+    int i;
+    i = 0;
+    while(i<5) {
+        int el1;
+        el1 = consume 0;
+        print el1;
+
+        int el2;
+        el2 = consume 1;
+        print el2;
+
+        list1 = append list1 el1;
+        list2 = append list2 el2;
+        i = i+1;
+    }
+    zippedList = zip list1 list2;
+    print (sum (map zippedList subtractTuple));
 }
