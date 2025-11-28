@@ -1,10 +1,10 @@
 Marie Curry
 ===========
-a simple language for processing infite streams in lazy way
+a simple language for processing infinite streams in lazy way
 -------------------------------------------------------------
 
 ## Main features
-- Marie Curry is a halfway between imperative and functional language, which gives both simplicity of imperative language, with possibilities of functional languages like higher-order functions, closures and currying
+- Marie Curry is a halfway between imperative and functional language, which gives both simplicity of imperative language, with features of functional languages like higher-order functions, closures and currying
 - Static strong type system, with support for structured types such as unit type, lists, pairs 
 - In-built support for infite streams of integers, which are processed in lazy way
 - Garbage collection based on reference counting - when returning from function call, memory cells with no reference are cleared
